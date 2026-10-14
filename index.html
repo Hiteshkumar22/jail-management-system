@@ -1,0 +1,4614 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <meta name="theme-color" content="#0b0f19">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="JMS Portal">
+  <title>Jail Management System</title>
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Core Stylesheet -->
+  <style>
+/* =========================================================
+   DESIGN SYSTEM & VARIABLES
+   ========================================================= */
+:root {
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+
+  /* Color Palette - Deep Dark Slate Theme */
+  --bg-main: #0b0f19;
+  --bg-sidebar: #020617;
+  --bg-card: rgba(21, 28, 44, 0.7);
+  --bg-card-hover: rgba(29, 39, 62, 0.85);
+  --border-color: rgba(36, 50, 79, 0.4);
+  --border-color-hover: rgba(59, 130, 246, 0.5);
+
+  /* Accent Colors */
+  --primary-gradient: linear-gradient(135deg, #4f46e5, #7c3aed);
+  --primary-glow: rgba(99, 102, 241, 0.35);
+  --color-primary: #6366f1;
+  --color-success: #10b981;
+  --color-info: #0ea5e9;
+  --color-warning: #f59e0b;
+  --color-danger: #f43f5e;
+
+  /* Text Colors */
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+
+  /* Borders and Shadows */
+  --radius-lg: 16px;
+  --radius-md: 10px;
+  /* Shadows */
+  --shadow-lg: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
+  --shadow-glow: 0 0 20px rgba(99, 102, 241, 0.15);
+
+  /* Inputs */
+  --input-bg: rgba(30, 41, 59, 0.5);
+  --input-focus-bg: rgba(30, 41, 59, 0.7);
+  --input-option-bg: #1e293b;
+
+  /* Transitions */
+  --transition-fast: 0.2s ease;
+  --transition-normal: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Light Mode Theme */
+[data-theme="light"] {
+  --bg-main: #f8fafc;
+  --bg-sidebar: #ffffff;
+  --bg-card: rgba(255, 255, 255, 0.7);
+  --bg-card-hover: rgba(255, 255, 255, 0.95);
+  --border-color: rgba(226, 232, 240, 0.8);
+  --border-color-hover: rgba(148, 163, 184, 0.5);
+
+  --primary-glow: rgba(99, 102, 241, 0.15);
+
+  --text-muted: #94a3b8;
+
+  --shadow-lg: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
+  --shadow-glow: 0 0 20px rgba(99, 102, 241, 0.05);
+
+  --input-bg: rgba(255, 255, 255, 0.7);
+  --input-focus-bg: rgba(255, 255, 255, 0.95);
+  --input-option-bg: #ffffff;
+}
+
+/* =========================================================
+   RESET & BASICS
+   ========================================================= */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--bg-main);
+  color: var(--text-primary);
+  min-height: 100vh;
+  overflow-x: hidden;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-main);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
+
+/* Helper Utilities */
+.text-secondary {
+  color: var(--text-secondary);
+}
+
+.text-success {
+  color: var(--color-success);
+}
+
+.text-info {
+  color: var(--color-info);
+}
+
+.text-warning {
+  color: var(--color-warning);
+}
+
+.text-danger {
+  color: var(--color-danger);
+}
+
+/* =========================================================
+   TOAST NOTIFICATION COMPONENT
+   ========================================================= */
+.toast-container {
+  position: fixed;
+  top: 24px;
+  right: 24px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.toast {
+  background: rgba(17, 24, 39, 0.9);
+  border: 1px solid var(--border-color);
+  border-left: 5px solid var(--color-primary);
+  border-radius: var(--radius-md);
+  padding: 16px 20px;
+  min-width: 320px;
+  max-width: 450px;
+  box-shadow: var(--shadow-lg);
+  backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transform: translateX(120%);
+  animation: slideIn 0.3s forwards cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transition: all var(--transition-fast);
+}
+
+@keyframes slideIn {
+  to {
+    transform: translateX(0);
+  }
+}
+
+.toast.toast-success {
+  border-left-color: var(--color-success);
+}
+
+.toast.toast-error {
+  border-left-color: var(--color-danger);
+}
+
+.toast-icon {
+  flex-shrink: 0;
+}
+
+.toast-success .toast-icon {
+  color: var(--color-success);
+}
+
+.toast-error .toast-icon {
+  color: var(--color-danger);
+}
+
+.toast-content {
+  flex-grow: 1;
+}
+
+.toast-title {
+  font-weight: 600;
+  font-size: 14px;
+  margin-bottom: 2px;
+}
+
+.toast-message {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+/* =========================================================
+   AUTHENTICATION VIEW (Glassmorphism card)
+   ========================================================= */
+.auth-wrapper {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 24px;
+  background: radial-gradient(circle at 10% 20%, rgba(99, 102, 241, 0.15) 0%, transparent 40%),
+    radial-gradient(circle at 90% 80%, rgba(139, 92, 246, 0.1) 0%, transparent 40%);
+}
+
+.auth-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 40px;
+  width: 100%;
+  max-width: 440px;
+  box-shadow: var(--shadow-lg);
+  backdrop-filter: blur(16px);
+  box-shadow: var(--shadow-glow);
+  animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.auth-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.auth-logo {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  width: 60px;
+  height: 60px;
+  background: var(--primary-gradient);
+  border-radius: var(--radius-md);
+  margin-bottom: 16px;
+  box-shadow: 0 0 15px var(--primary-glow);
+}
+
+.logo-icon {
+  width: 30px;
+  height: 30px;
+  color: white;
+}
+
+.auth-header h1 {
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  margin-bottom: 6px;
+}
+
+.auth-header p {
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+.auth-footer {
+  margin-top: 24px;
+  text-align: center;
+  font-size: 14px;
+}
+
+.auth-toggle-msg {
+  display: inline;
+  color: var(--text-secondary);
+}
+
+.admin-notice {
+  margin-top: 24px;
+  padding: 12px 16px;
+  background: rgba(59, 130, 246, 0.08);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 12px;
+  color: #93c5fd;
+}
+
+.notice-icon {
+  width: 16px;
+  height: 16px;
+  margin-top: 1px;
+  color: #60a5fa;
+  flex-shrink: 0;
+}
+
+/* =========================================================
+   FORM CONTROL COMPONENT
+   ========================================================= */
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 16px;
+}
+
+label {
+  display: block;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+}
+
+.input-wrapper {
+  position: relative;
+}
+
+.input-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 18px;
+  height: 18px;
+  color: var(--text-muted);
+}
+
+input[type="text"],
+input[type="password"],
+input[type="email"],
+input[type="number"],
+input[type="tel"],
+input[type="date"],
+select {
+  width: 100%;
+  background: var(--input-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 12px 16px;
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  transition: background-color var(--transition-fast), border-color var(--transition-fast), box-shadow var(--transition-fast);
+  outline: none;
+}
+
+.input-wrapper input,
+.input-wrapper select {
+  padding-left: 44px;
+}
+
+/* Ensure option elements are readable on dark themes */
+select option {
+  background-color: var(--input-option-bg);
+  color: var(--text-primary);
+}
+
+input:focus,
+select:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+  background: var(--input-focus-bg);
+}
+
+/* Override browser autofill white/yellow background */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0px 1000px rgba(30, 41, 59, 0.8) inset !important;
+  -webkit-text-fill-color: var(--text-primary) !important;
+  border-color: var(--border-color) !important;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+/* Custom Dropdown styling */
+select {
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  background-size: 16px;
+  padding-right: 40px;
+}
+
+/* =========================================================
+   BUTTON COMPONENT
+   ========================================================= */
+.btn {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: var(--radius-md);
+  border: 1px solid transparent;
+  cursor: pointer;
+  font-family: var(--font-sans);
+  transition: all var(--transition-fast);
+  outline: none;
+}
+
+.btn-icon {
+  width: 16px;
+  height: 16px;
+}
+
+.btn-block {
+  width: 100%;
+}
+
+.btn-primary {
+  background: var(--primary-gradient);
+  color: white;
+  box-shadow: 0 4px 10px rgba(99, 102, 241, 0.2);
+}
+
+.btn-primary:hover:not(:disabled) {
+  opacity: 0.9;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 15px rgba(99, 102, 241, 0.3);
+}
+
+.btn-info {
+  background: var(--color-info);
+  color: white;
+}
+
+.btn-info:hover:not(:disabled) {
+  background: #0284c7;
+  transform: translateY(-1px);
+}
+
+.btn-danger {
+  background: var(--color-danger);
+  color: white;
+}
+
+.btn-danger:hover:not(:disabled) {
+  background: #e11d48;
+  transform: translateY(-1px);
+}
+
+.btn-secondary {
+  background: #334155;
+  border-color: var(--border-color);
+  color: var(--text-primary);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: #475569;
+}
+
+.btn-link {
+  background: transparent;
+  border: none;
+  color: var(--color-primary);
+  padding: 0;
+  text-decoration: underline;
+}
+
+.btn-link:hover {
+  color: #8b5cf6;
+}
+
+.btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+/* Form Actions Row */
+.form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.form-actions .btn {
+  flex: 1;
+  min-width: 80px;
+}
+
+.btn-disabled,
+.btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* =========================================================
+   APPLICATION LAYOUT (Sidebar & Main content)
+   ========================================================= */
+.app-layout {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* SIDEBAR styling */
+.sidebar {
+  width: 260px;
+  background-color: var(--bg-sidebar);
+  border-right: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  z-index: 100;
+}
+
+.sidebar-header {
+  padding: 30px 24px 20px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.app-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.brand-icon {
+  width: 32px;
+  height: 32px;
+  color: var(--color-primary);
+  filter: drop-shadow(0 0 5px var(--primary-glow));
+}
+
+.app-brand span {
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  background: var(--primary-gradient);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.user-badge {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(30, 41, 59, 0.4);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 12px;
+}
+
+.user-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--primary-gradient);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: 600;
+  font-size: 16px;
+  color: white;
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
+  text-transform: uppercase;
+}
+
+.user-details h4 {
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.user-details span {
+  font-size: 11px;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.sidebar-nav {
+  flex-grow: 1;
+  padding: 24px 16px;
+}
+
+.sidebar-nav ul {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.nav-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 16px;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: left;
+  transition: all var(--transition-fast);
+}
+
+.nav-btn i {
+  width: 20px;
+  height: 20px;
+}
+
+.nav-btn:hover {
+  background: rgba(30, 41, 59, 0.5);
+  color: var(--text-primary);
+}
+
+.nav-btn.active {
+  background: var(--primary-gradient);
+  color: white;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
+}
+
+.sidebar-footer {
+  padding: 20px 16px;
+  border-top: 1px solid var(--border-color);
+}
+
+/* MAIN BODY styling */
+.main-content {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  /* Prevents flex items from overflowing */
+}
+
+.content-header {
+  height: 80px;
+  padding: 0 40px;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-shrink: 0;
+  background: rgba(11, 15, 25, 0.8);
+  backdrop-filter: blur(10px);
+  position: sticky;
+  top: 0;
+  z-index: 90;
+}
+
+.header-title-container h2 {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+
+.header-title-container p {
+  font-size: 13px;
+}
+
+.current-time {
+  font-family: monospace;
+  background: rgba(30, 41, 59, 0.5);
+  border: 1px solid var(--border-color);
+  padding: 8px 16px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.view-body {
+  padding: 40px;
+  flex-grow: 1;
+}
+
+.view-section {
+  animation: viewFadeIn 0.3s ease-out;
+}
+
+@keyframes viewFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* =========================================================
+   DASHBOARD CARDS
+   ========================================================= */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 24px;
+  margin-bottom: 30px;
+}
+
+.stat-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  position: relative;
+  overflow: hidden;
+  transition: all var(--transition-fast);
+}
+
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+}
+
+.stat-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--border-color-hover);
+  background: var(--bg-card-hover);
+}
+
+.stat-prisoners::before {
+  background-color: var(--color-primary);
+}
+
+.stat-staff::before {
+  background-color: var(--color-success);
+}
+
+.stat-visitors::before {
+  background-color: var(--color-warning);
+}
+
+.stat-card .stat-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-md);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  align-self: flex-start;
+}
+
+.stat-prisoners .stat-icon {
+  background: rgba(99, 102, 241, 0.15);
+  color: var(--color-primary);
+}
+
+.stat-staff .stat-icon {
+  background: rgba(16, 185, 129, 0.15);
+  color: var(--color-success);
+}
+
+.stat-visitors .stat-icon {
+  background: rgba(245, 158, 11, 0.15);
+  color: var(--color-warning);
+}
+
+.stat-card .stat-icon i {
+  width: 24px;
+  height: 24px;
+}
+
+.stat-info h3 {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  margin-bottom: 4px;
+}
+
+.stat-value {
+  font-size: 36px;
+  font-weight: 700;
+  color: white;
+  line-height: 1;
+}
+
+.stat-footer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  border-top: 1px solid var(--border-color);
+  padding-top: 12px;
+  margin-top: auto;
+}
+
+.stat-footer i {
+  width: 14px;
+  height: 14px;
+}
+
+/* =========================================================
+   GENERIC CARD CONTAINER
+   ========================================================= */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+}
+
+.card-header {
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.card-header h3 {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+/* =========================================================
+   CHART COMPONENT
+   ========================================================= */
+.dashboard-details {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 24px;
+}
+
+.chart-card {
+  padding-bottom: 24px;
+}
+
+.chart-container {
+  position: relative;
+  height: 380px;
+  width: 100%;
+  padding: 24px;
+}
+
+.releases-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow-y: auto;
+  max-height: 330px;
+  padding-right: 4px;
+}
+
+.release-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  background: rgba(30, 41, 59, 0.4);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  transition: all var(--transition-fast);
+}
+
+.release-item:hover {
+  background: rgba(30, 41, 59, 0.7);
+  border-color: rgba(99, 102, 241, 0.3);
+}
+
+.release-item-left {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.release-p-id {
+  font-family: monospace;
+  font-weight: 700;
+  color: #6366f1;
+  font-size: 13px;
+}
+
+.release-p-name {
+  font-size: 14px;
+  color: white;
+  font-weight: 500;
+}
+
+.release-item-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+
+.release-days {
+  font-size: 13px;
+  font-weight: 600;
+  color: #f59e0b;
+}
+
+.release-date {
+  font-size: 10px;
+  color: var(--text-secondary);
+}
+
+
+/* =========================================================
+   GRID FOR MANAGEMENT INTERFACES (Form left, Table right)
+   ========================================================= */
+.management-grid {
+  display: grid;
+  grid-template-columns: 380px 1fr;
+  gap: 24px;
+  align-items: start;
+}
+
+.form-card {
+  padding: 24px;
+}
+
+.form-card .card-header {
+  padding: 0 0 16px 0;
+  margin-bottom: 20px;
+}
+
+/* =========================================================
+   TABLE CONTROLS & COMPONENT
+   ========================================================= */
+.table-card {
+  display: flex;
+  flex-direction: column;
+}
+
+.table-toolbar {
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.search-box {
+  position: relative;
+  flex-grow: 1;
+  max-width: 400px;
+}
+
+.search-box i {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 18px;
+  height: 18px;
+  color: var(--text-muted);
+}
+
+.search-box input {
+  padding-left: 44px;
+  height: 42px;
+}
+
+.filter-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+}
+
+.filter-box select {
+  height: 42px;
+  width: 160px;
+  padding: 8px 36px 8px 16px;
+}
+
+/* Table Responsive wrapper */
+.table-responsive {
+  overflow-x: auto;
+  width: 100%;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 14px;
+}
+
+.data-table th,
+.data-table td {
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.data-table th {
+  background: rgba(30, 41, 59, 0.4);
+  font-weight: 600;
+  color: var(--text-secondary);
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.data-table tbody tr {
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.data-table tbody tr:hover {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.data-table tbody tr.selected-row {
+  background: rgba(99, 102, 241, 0.1);
+  color: white;
+}
+
+.data-table tbody tr.selected-row td {
+  border-bottom-color: rgba(99, 102, 241, 0.4);
+}
+
+/* Status Capsular badges */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 50px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.badge-success {
+  background: rgba(16, 185, 129, 0.15);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.25);
+}
+
+.badge-danger {
+  background: rgba(244, 63, 94, 0.15);
+  color: #fb7185;
+  border: 1px solid rgba(244, 63, 94, 0.25);
+}
+
+/* Mobile Navigation Toggle Buttons & Overlay Defaults */
+.mobile-menu-btn {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  background: var(--input-bg);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all var(--transition-fast);
+}
+
+.mobile-menu-btn:hover {
+  background: var(--bg-card-hover);
+  border-color: var(--border-color-hover);
+  color: var(--color-primary);
+}
+
+.sidebar-close-btn {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-md);
+  background: rgba(30, 41, 59, 0.5);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.sidebar-close-btn:hover {
+  background: rgba(244, 63, 94, 0.15);
+  color: var(--color-danger);
+  border-color: rgba(244, 63, 94, 0.3);
+}
+
+.sidebar-overlay {
+  display: none;
+}
+
+/* =========================================================
+   RESPONSIVENESS (Mobile, Tablet, Desktop)
+   ========================================================= */
+@media (max-width: 1024px) {
+  .management-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-details {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 900px) {
+  .mobile-menu-btn {
+    display: inline-flex;
+  }
+
+  .sidebar-close-btn {
+    display: inline-flex;
+  }
+
+  .sidebar-overlay {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(2, 6, 23, 0.7);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 998;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .sidebar-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 285px;
+    max-width: 85vw;
+    height: 100vh;
+    height: 100dvh;
+    z-index: 999;
+    transform: translateX(-105%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .sidebar.open {
+    transform: translateX(0);
+  }
+
+  .app-layout {
+    display: block;
+    min-height: 100vh;
+  }
+
+  .main-content {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .content-header {
+    padding: 0 16px;
+    height: 64px;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .header-title-container h2 {
+    font-size: 18px;
+  }
+
+  .header-title-container p {
+    font-size: 12px;
+  }
+
+  .view-body {
+    padding: 20px 16px;
+  }
+
+  .stats-grid {
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+  }
+
+  .management-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .table-toolbar {
+    padding: 14px 16px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .search-box {
+    max-width: 100%;
+  }
+
+  .filter-box {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .filter-box select {
+    flex-grow: 1;
+  }
+
+  .table-responsive {
+    -webkit-overflow-scrolling: touch;
+  }
+
+  #dossier-preview-wrapper {
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+@media (max-width: 600px) {
+  .current-time {
+    display: none;
+  }
+
+  .header-title-container p {
+    display: none;
+  }
+
+  .header-title-container h2 {
+    font-size: 16px;
+  }
+
+  .view-body {
+    padding: 14px 12px;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .stat-card {
+    padding: 16px;
+  }
+
+  .form-card, .table-card {
+    padding: 16px 12px;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .auth-card {
+    padding: 24px 18px;
+  }
+
+  .toast {
+    min-width: calc(100vw - 32px);
+    max-width: calc(100vw - 32px);
+  }
+
+  .toast-container {
+    top: 12px;
+    right: 16px;
+    left: 16px;
+  }
+
+  .data-table th,
+  .data-table td {
+    padding: 10px 12px;
+    font-size: 13px;
+  }
+}
+
+/* =========================================================
+   PRINT STYLES FOR OFFICIAL DOSSIER
+   ========================================================= */
+@media print {
+  body * {
+    visibility: hidden !important;
+  }
+  #dossier-modal, #dossier-modal * {
+    visibility: visible !important;
+  }
+  #dossier-modal {
+    display: block !important;
+    position: absolute !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 100% !important;
+    height: auto !important;
+    background: transparent !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    overflow: visible !important;
+    box-shadow: none !important;
+  }
+  #dossier-modal > div > div:first-child {
+    display: none !important;
+  }
+  #dossier-preview-wrapper {
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  #dossier-template {
+    width: 100% !important;
+    box-shadow: none !important;
+    margin: 0 !important;
+    page-break-after: avoid !important;
+    page-break-inside: avoid !important;
+  }
+  @page {
+    size: A4 portrait;
+    margin: 0mm;
+  }
+}
+
+</style>
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- GSAP Animation CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <!-- HTML2Canvas CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <!-- jsPDF CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <!-- HTML2PDF CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+
+<body>
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- AUTHENTICATION VIEW -->
+  <div id="auth-view" class="auth-wrapper">
+    <div class="auth-card">
+      <div class="auth-header">
+        <div class="auth-logo">
+          <i data-lucide="shield-alert" class="logo-icon"></i>
+        </div>
+        <h1>Jail Management System</h1>
+        <p id="auth-subtitle">Login to access your dashboard</p>
+      </div>
+
+      <form id="auth-form" onsubmit="handleAuthSubmit(event)">
+        <div class="input-group">
+          <label for="auth-username">Username</label>
+          <div class="input-wrapper">
+            <i data-lucide="user" class="input-icon"></i>
+            <input type="text" id="auth-username" placeholder="Enter username" required autocomplete="username">
+          </div>
+        </div>
+
+        <div class="input-group" style="margin-top: 15px;">
+          <label for="auth-password">Password</label>
+          <div class="input-wrapper">
+            <i data-lucide="lock" class="input-icon"></i>
+            <input type="password" id="auth-password" placeholder="Enter password" required
+              autocomplete="current-password">
+          </div>
+        </div>
+
+        <!-- Role selector: only shown during Sign Up -->
+        <div class="input-group" id="role-group" style="margin-top: 15px; display: none;">
+          <label for="auth-role">Select Your Role</label>
+          <div class="input-wrapper">
+            <i data-lucide="shield" class="input-icon"></i>
+            <select id="auth-role">
+              <option value="Officer">Officer</option>
+              <option value="Warden">Warden</option>
+              <option value="Guard">Guard</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Email: only shown during Sign Up -->
+        <div class="input-group" id="email-group" style="margin-top: 15px; display: none;">
+          <label for="auth-email">Email Address</label>
+          <div class="input-wrapper">
+            <i data-lucide="mail" class="input-icon"></i>
+            <input type="email" id="auth-email" placeholder="you@example.com" autocomplete="email">
+          </div>
+        </div>
+
+        <!-- Phone number: only shown during Sign Up -->
+        <div class="input-group" id="phone-group" style="margin-top: 15px; display: none;">
+          <label for="auth-phone">Phone Number (10 digits)</label>
+          <div class="input-wrapper">
+            <i data-lucide="phone" class="input-icon"></i>
+            <input type="tel" id="auth-phone" placeholder="Enter 10-digit phone number" pattern="[0-9]{10}"
+              maxlength="10" autocomplete="tel">
+          </div>
+        </div>
+
+        <button type="submit" id="auth-submit-btn" class="btn btn-primary btn-block" style="margin-top: 25px;">
+          <span>Login</span>
+          <i data-lucide="log-in" class="btn-icon"></i>
+        </button>
+
+        <!-- Forgot Password link (login mode only) -->
+        <div id="forgot-link-wrap" style="text-align:center; margin-top:12px;">
+          <button type="button" onclick="showForgotPanel()" class="btn btn-link"
+            style="font-size:13px; color:var(--text-secondary);">
+            <i data-lucide="key-round" style="width:13px;height:13px;vertical-align:middle;margin-right:4px;"></i>Forgot
+            Password?
+          </button>
+        </div>
+      </form>
+
+      <!-- ===== FORGOT PASSWORD PANEL ===== -->
+      <div id="forgot-panel" style="display:none;">
+
+        <!-- STEP 1: Enter Email -->
+        <div id="fp-step1">
+          <div style="text-align:center;margin-bottom:24px;">
+            <div
+              style="width:64px;height:64px;background:var(--primary-gradient);border-radius:16px;display:inline-flex;align-items:center;justify-content:center;box-shadow:0 0 24px var(--primary-glow);animation:pulse-glow 2s infinite alternate;">
+              <i data-lucide="key-round" style="width:28px;height:28px;color:white;"></i>
+            </div>
+            <h2 style="margin-top:14px;font-size:22px;font-weight:700;letter-spacing:-0.3px;">Forgot Password?</h2>
+            <p style="color:var(--text-secondary);font-size:13px;margin-top:6px;line-height:1.6;">
+              Enter your registered email — we'll send you an <strong style="color:#6366f1;">OTP</strong> to reset your
+              password.
+            </p>
+          </div>
+
+          <div class="input-group" style="margin-bottom:0;">
+            <label for="fp-email"
+              style="font-size:12px;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;color:var(--text-secondary);">
+              📧 Registered Email Address
+            </label>
+            <div class="input-wrapper" style="margin-top:6px;">
+              <i data-lucide="mail" class="input-icon"></i>
+              <input type="email" id="fp-email" placeholder="you@example.com" autocomplete="email"
+                oninput="this.value=this.value.trim()"
+                onkeydown="if(event.key==='Enter'){event.preventDefault();requestOtp();}" style="font-size:15px;">
+            </div>
+          </div>
+          <p style="font-size:11.5px;color:var(--text-muted);margin-top:8px;">
+            <i data-lucide="info" style="width:11px;height:11px;vertical-align:middle;margin-right:3px;"></i>
+            Use the email you provided during Sign Up
+          </p>
+
+          <button id="fp-send-btn" onclick="requestOtp()" class="btn btn-primary btn-block"
+            style="margin-top:18px;padding:13px 20px;font-size:15px;font-weight:600;border-radius:12px;gap:10px;">
+            <i data-lucide="send" style="width:17px;height:17px;"></i>
+            <span>Send OTP to Email</span>
+          </button>
+        </div>
+
+        <!-- STEP 2: Enter OTP -->
+        <div id="fp-step2" style="display:none;">
+          <div style="text-align:center;margin-bottom:24px;">
+            <div
+              style="width:64px;height:64px;background:linear-gradient(135deg,#10b981,#059669);border-radius:16px;display:inline-flex;align-items:center;justify-content:center;box-shadow:0 0 24px rgba(16,185,129,0.4);">
+              <i data-lucide="mail-check" style="width:28px;height:28px;color:white;"></i>
+            </div>
+            <h2 style="margin-top:14px;font-size:22px;font-weight:700;">Check Your Email</h2>
+            <p id="fp-email-notice" style="color:var(--text-secondary);font-size:13px;margin-top:6px;">OTP sent to your
+              registered email</p>
+            <p style="color:var(--text-muted);font-size:11.5px;margin-top:4px;">⏱ OTP is valid for <strong>10
+                minutes</strong></p>
+          </div>
+
+          <div class="input-group">
+            <label for="fp-otp"
+              style="font-size:12px;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;color:var(--text-secondary);">
+              🔢 Enter 6-Digit OTP
+            </label>
+            <div class="input-wrapper" style="margin-top:6px;">
+              <i data-lucide="hash" class="input-icon"></i>
+              <input type="text" id="fp-otp" placeholder="- - - - - -" maxlength="6" autocomplete="one-time-code"
+                onkeydown="if(event.key==='Enter'){event.preventDefault();verifyOtp();}"
+                oninput="this.value=this.value.replace(/\D/g,'')"
+                style="letter-spacing:10px;font-size:22px;font-weight:700;text-align:center;padding-left:44px;">
+            </div>
+          </div>
+
+          <button onclick="verifyOtp()" class="btn btn-primary btn-block"
+            style="margin-top:18px;padding:13px 20px;font-size:15px;font-weight:600;border-radius:12px;gap:10px;">
+            <i data-lucide="check-circle" style="width:17px;height:17px;"></i>
+            <span>Verify OTP &amp; Continue</span>
+          </button>
+          <button onclick="requestOtp()" class="btn btn-link btn-block"
+            style="margin-top:10px;font-size:12px;color:var(--text-muted);">
+            <i data-lucide="refresh-cw" style="width:12px;height:12px;"></i>
+            Resend OTP
+          </button>
+        </div>
+
+        <!-- STEP 3: Set New Password -->
+        <div id="fp-step3" style="display:none;">
+          <div style="text-align:center;margin-bottom:24px;">
+            <div
+              style="width:64px;height:64px;background:linear-gradient(135deg,#6366f1,#8b5cf6);border-radius:16px;display:inline-flex;align-items:center;justify-content:center;box-shadow:0 0 24px rgba(99,102,241,0.4);">
+              <i data-lucide="lock" style="width:28px;height:28px;color:white;"></i>
+            </div>
+            <h2 style="margin-top:14px;font-size:22px;font-weight:700;">Set New Password</h2>
+            <p style="color:#10b981;font-size:13px;margin-top:6px;font-weight:600;">✅ OTP verified — create your new
+              password</p>
+          </div>
+
+          <div class="input-group">
+            <label for="fp-new-pwd"
+              style="font-size:12px;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;color:var(--text-secondary);">
+              🔒 New Password (min 6 chars)
+            </label>
+            <div class="input-wrapper" style="margin-top:6px;">
+              <i data-lucide="lock" class="input-icon"></i>
+              <input type="password" id="fp-new-pwd" placeholder="Enter new password" autocomplete="new-password"
+                style="font-size:15px;">
+            </div>
+          </div>
+          <div class="input-group" style="margin-top:14px;">
+            <label for="fp-confirm-pwd"
+              style="font-size:12px;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;color:var(--text-secondary);">
+              🔒 Confirm New Password
+            </label>
+            <div class="input-wrapper" style="margin-top:6px;">
+              <i data-lucide="lock-keyhole" class="input-icon"></i>
+              <input type="password" id="fp-confirm-pwd" placeholder="Repeat new password" autocomplete="new-password"
+                onkeydown="if(event.key==='Enter'){event.preventDefault();resetPassword();}" style="font-size:15px;">
+            </div>
+          </div>
+
+          <button onclick="resetPassword()" class="btn btn-primary btn-block"
+            style="margin-top:18px;padding:13px 20px;font-size:15px;font-weight:600;border-radius:12px;gap:10px;">
+            <i data-lucide="save" style="width:17px;height:17px;"></i>
+            <span>Save New Password</span>
+          </button>
+        </div>
+
+        <!-- Back to Login -->
+        <div style="text-align:center;margin-top:18px;padding-top:14px;border-top:1px solid rgba(255,255,255,0.06);">
+          <button type="button" onclick="hideForgotPanel()" class="btn btn-link"
+            style="font-size:13px;color:var(--text-secondary);display:inline-flex;align-items:center;gap:5px;">
+            <i data-lucide="arrow-left" style="width:14px;height:14px;"></i> Back to Login
+          </button>
+        </div>
+      </div>
+
+      <style>
+        @keyframes pulse-glow {
+          from {
+            box-shadow: 0 0 12px var(--primary-glow);
+          }
+
+          to {
+            box-shadow: 0 0 28px var(--primary-glow), 0 0 48px rgba(99, 102, 241, 0.3);
+          }
+        }
+
+        #fp-send-btn:hover:not(:disabled),
+        #fp-step2 .btn-primary:hover:not(:disabled),
+        #fp-step3 .btn-primary:hover:not(:disabled) {
+          transform: translateY(-1px);
+          box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+        }
+
+        #fp-otp {
+          caret-color: #6366f1;
+        }
+      </style>
+
+
+      <div class="auth-footer" style="margin-top: 20px;">
+        <p id="auth-toggle-msg">Don't have an account?</p>
+        <button id="auth-toggle-btn" onclick="toggleAuthMode()" class="btn btn-link">Sign Up</button>
+      </div>
+
+      <div id="admin-notice" class="admin-notice" style="display: none; margin-top: 15px;">
+        <i data-lucide="info" class="notice-icon"></i>
+        <span>First registered account will be configured as <strong>Admin</strong></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN APPLICATION VIEW -->
+  <div id="app-view" class="app-layout" style="display: none;">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px;">
+          <div class="app-brand" style="margin-bottom: 0;">
+            <i data-lucide="shield-alert" class="brand-icon"></i>
+            <span>JMS</span>
+          </div>
+          <button id="sidebar-close-btn" class="sidebar-close-btn" onclick="toggleMobileSidebar(false)" aria-label="Close sidebar">
+            <i data-lucide="x"></i>
+          </button>
+        </div>
+        <div class="user-badge">
+          <div class="user-avatar" id="sidebar-avatar">A</div>
+          <div class="user-details">
+            <h4 id="sidebar-username">admin</h4>
+            <span id="sidebar-role">Admin</span>
+          </div>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <ul>
+          <li>
+            <button id="nav-dashboard" class="nav-btn active" onclick="switchView('dashboard')">
+              <i data-lucide="layout-dashboard"></i>
+              <span>Dashboard</span>
+            </button>
+          </li>
+          <li id="nav-approvals-item" style="display: none;">
+            <button id="nav-approvals" class="nav-btn" onclick="switchView('approvals')">
+              <i data-lucide="user-check"></i>
+              <span>Pending Approvals</span>
+            </button>
+          </li>
+          <li id="nav-prisoners-item">
+            <button id="nav-prisoners" class="nav-btn" onclick="switchView('prisoners')">
+              <i data-lucide="users"></i>
+              <span>Prisoners</span>
+            </button>
+          </li>
+          <li id="nav-staff-item">
+            <button id="nav-staff" class="nav-btn" onclick="switchView('staff')">
+              <i data-lucide="shield"></i>
+              <span>Staff</span>
+            </button>
+          </li>
+          <li>
+            <button id="nav-visitors" class="nav-btn" onclick="switchView('visitors')">
+              <i data-lucide="footprints"></i>
+              <span>Visitors</span>
+            </button>
+          </li>
+          <li>
+            <button id="nav-cells" class="nav-btn" onclick="switchView('cells')">
+              <i data-lucide="home"></i>
+              <span>Cells</span>
+            </button>
+          </li>
+          <li>
+            <button id="nav-incidents" class="nav-btn" onclick="switchView('incidents')">
+              <i data-lucide="alert-triangle"></i>
+              <span>Incidents</span>
+            </button>
+          </li>
+          <li>
+            <button id="nav-reports" class="nav-btn" onclick="switchView('reports')">
+              <i data-lucide="file-text"></i>
+              <span>Reports</span>
+            </button>
+          </li>
+          <li id="nav-logs-item">
+            <button id="nav-logs" class="nav-btn" onclick="switchView('logs')">
+              <i data-lucide="history"></i>
+              <span>Audit Logs</span>
+            </button>
+          </li>
+        </ul>
+      </nav>
+
+      <!-- My Profile Card (Officer / Guard only) -->
+      <div id="my-profile-card"
+        style="display:none; margin: 10px 12px; background: rgba(99,102,241,0.08); border: 1px solid rgba(99,102,241,0.25); border-radius: 10px; padding: 12px; font-size: 12px;">
+        <div
+          style="color: var(--text-secondary); font-size: 11px; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 8px; display:flex; align-items:center; gap:5px;">
+          <i data-lucide="id-card" style="width:12px;height:12px;"></i> My Staff Profile
+        </div>
+        <div style="display:flex; flex-direction:column; gap:5px;">
+          <div style="display:flex; justify-content:space-between;">
+            <span style="color:var(--text-secondary);">Staff ID</span>
+            <span id="my-staff-id" style="color:var(--text-primary); font-weight:600;">-</span>
+          </div>
+          <div style="display:flex; justify-content:space-between;">
+            <span style="color:var(--text-secondary);">Role</span>
+            <span id="my-staff-role" style="color:var(--accent-primary); font-weight:600;">-</span>
+          </div>
+          <div style="display:flex; justify-content:space-between;">
+            <span style="color:var(--text-secondary);">Shift</span>
+            <span id="my-staff-shift" style="color:var(--text-primary);">-</span>
+          </div>
+          <div style="display:flex; justify-content:space-between;">
+            <span style="color:var(--text-secondary);">Hours</span>
+            <span id="my-staff-hours" style="color:var(--text-primary);">-</span>
+          </div>
+          <div style="display:flex; justify-content:space-between;">
+            <span style="color:var(--text-secondary);">Phone</span>
+            <span id="my-staff-phone" style="color:var(--text-primary);">-</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="sidebar-footer">
+        <button id="logout-btn" class="btn btn-danger btn-block" onclick="logout()">
+          <i data-lucide="log-out"></i>
+          <span>Logout</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- SIDEBAR OVERLAY FOR MOBILE/TABLET -->
+    <div id="sidebar-overlay" class="sidebar-overlay" onclick="toggleMobileSidebar(false)"></div>
+
+    <!-- MAIN Content AREA -->
+    <main class="main-content">
+      <!-- HEADER -->
+      <header class="content-header">
+        <div class="header-left" style="display: flex; align-items: center; gap: 14px; min-width: 0;">
+          <button id="mobile-menu-btn" class="mobile-menu-btn" onclick="toggleMobileSidebar(true)" aria-label="Open navigation menu">
+            <i data-lucide="menu"></i>
+          </button>
+          <div class="header-title-container" style="min-width: 0;">
+            <h2 id="view-title">Dashboard Overview</h2>
+            <p id="view-description" class="text-secondary">Summary metrics and charts</p>
+          </div>
+        </div>
+        <div class="header-actions" style="display: flex; align-items: center; gap: 15px;">
+          <button id="theme-toggle" class="btn btn-secondary" onclick="toggleTheme()"
+            style="padding: 8px; border-radius: 50%;">
+            <i data-lucide="moon" id="theme-icon"></i>
+          </button>
+          <div class="current-time" id="live-clock">Loading...</div>
+        </div>
+      </header>
+
+      <!-- VIEW PAGES -->
+      <div class="view-body">
+
+        <!-- DASHBOARD VIEW -->
+        <section id="view-dashboard" class="view-section">
+          <!-- Stats Grid -->
+          <div class="stats-grid">
+            <div class="stat-card stat-prisoners">
+              <div class="stat-icon">
+                <i data-lucide="users"></i>
+              </div>
+              <div class="stat-info">
+                <h3>Total Prisoners</h3>
+                <p class="stat-value" id="stat-count-prisoners">0</p>
+              </div>
+              <div class="stat-footer text-success">
+                <i data-lucide="activity"></i>
+                <span id="stat-active-prisoners">Active: 0 | Released: 0</span>
+              </div>
+            </div>
+
+            <div class="stat-card stat-staff">
+              <div class="stat-icon">
+                <i data-lucide="shield"></i>
+              </div>
+              <div class="stat-info">
+                <h3>Active Staff</h3>
+                <p class="stat-value" id="stat-count-staff">0</p>
+              </div>
+              <div class="stat-footer text-info">
+                <i data-lucide="clock"></i>
+                <span>Staff Roster Assigned</span>
+              </div>
+            </div>
+
+            <div class="stat-card stat-visitors">
+              <div class="stat-icon">
+                <i data-lucide="footprints"></i>
+              </div>
+              <div class="stat-info">
+                <h3>Total Visitors</h3>
+                <p class="stat-value" id="stat-count-visitors">0</p>
+              </div>
+              <div class="stat-footer text-warning">
+                <i data-lucide="calendar"></i>
+                <span id="stat-cells-occupancy">Cells Occupied: 0/0</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Charts & Releases Container -->
+          <div class="dashboard-details">
+            <div class="card chart-card">
+              <div class="card-header">
+                <h3>System Overview Chart</h3>
+              </div>
+              <div class="chart-container">
+                <canvas id="overview-chart"></canvas>
+              </div>
+            </div>
+
+            <div class="card releases-card" style="padding: 20px;">
+              <div class="card-header" style="border: none; padding: 0 0 15px 0;">
+                <h3>Upcoming Releases (Next 30 Days)</h3>
+              </div>
+              <div class="releases-list" id="releases-list">
+                <p class="text-secondary" style="font-size: 13px; text-align: center; margin-top: 20px;">No releases
+                  scheduled.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- APPROVALS VIEW -->
+        <section id="view-approvals" class="view-section" style="display: none;">
+          <div class="card table-card" style="width: 100%;">
+            <div class="card-header" style="padding: 20px; border-bottom: 1px solid var(--border-color);">
+              <h3>Pending Account Approvals</h3>
+              <p class="text-secondary" style="font-size: 13px; margin-top: 4px;">Review and authorize new staff account
+                requests.</p>
+            </div>
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Username</th>
+                    <th>Role Requested</th>
+                    <th>Email</th>
+                    <th>Requested At</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="approvals-table-body">
+                  <!-- Dynamic Rows -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- PRISONERS VIEW -->
+        <section id="view-prisoners" class="view-section" style="display: none;">
+          <div class="management-grid">
+            <!-- Form Block -->
+            <div class="card form-card">
+              <div class="card-header">
+                <h3 id="prisoner-form-title">Add Prisoner Record</h3>
+              </div>
+              <form id="prisoner-form" onsubmit="handlePrisonerSubmit(event)">
+                <input type="hidden" id="p-selected-id">
+
+                <div class="form-group">
+                  <label for="p-name">Full Name</label>
+                  <input type="text" id="p-name" placeholder="John Doe" required>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="p-age">Age</label>
+                    <input type="number" id="p-age" min="18" max="120" placeholder="18+" required>
+                  </div>
+                  <div class="form-group">
+                    <label for="p-gender">Gender</label>
+                    <select id="p-gender" required>
+                      <option value="Male">Male</option>
+                      <option value="Female">Female</option>
+                      <option value="Other">Other</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="p-cell">Cell ID</label>
+                    <input type="text" id="p-cell" placeholder="e.g. 101" required>
+                  </div>
+                  <div class="form-group">
+                    <label for="p-block">Block</label>
+                    <input type="text" id="p-block" placeholder="A/B/C/D">
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label for="p-crime">Crime / Charge</label>
+                  <input type="text" id="p-crime" placeholder="Theft" required>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="p-entry">Entry Date</label>
+                    <input type="date" id="p-entry" required>
+                  </div>
+                  <div class="form-group">
+                    <label for="p-days">Sentence (Days)</label>
+                    <input type="number" id="p-days" min="1" placeholder="365" required>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label for="p-emergency">Emergency Contact</label>
+                  <input type="text" id="p-emergency" placeholder="Raj Singh">
+                </div>
+
+                <div class="form-group">
+                  <label for="p-phone">Contact Phone</label>
+                  <input type="tel" id="p-phone" placeholder="10-digit phone number">
+                </div>
+
+                <!-- Mugshot Photo Upload -->
+                <div class="form-group">
+                  <label for="p-photo">Mugshot / Photo <span style="font-weight:400;color:var(--text-muted);">(optional,
+                      JPG/PNG)</span></label>
+                  <div style="display:flex;align-items:center;gap:12px;margin-top:4px;">
+                    <label for="p-photo"
+                      style="display:inline-flex;align-items:center;gap:8px;padding:9px 16px;background:rgba(30,41,59,0.6);border:1px dashed var(--border-color);border-radius:8px;cursor:pointer;font-size:13px;color:var(--text-secondary);transition:border-color 0.2s;"
+                      onmouseover="this.style.borderColor='var(--color-primary)'"
+                      onmouseout="this.style.borderColor='var(--border-color)'">
+                      <i data-lucide="camera" style="width:15px;height:15px;"></i>
+                      Choose Photo
+                    </label>
+                    <input type="file" id="p-photo" accept="image/*" style="display:none;"
+                      onchange="previewMugshot(this)">
+                    <img id="p-photo-preview" src="" alt="Preview"
+                      style="display:none;width:52px;height:52px;border-radius:8px;object-fit:cover;border:2px solid var(--color-primary);">
+                    <span id="p-photo-name" style="font-size:12px;color:var(--text-muted);">No file chosen</span>
+                  </div>
+                </div>
+
+                <div class="form-actions">
+                  <button type="submit" id="p-btn-add" class="btn btn-primary">Add</button>
+                  <button type="button" id="p-btn-update" class="btn btn-info btn-disabled" onclick="updatePrisoner()"
+                    disabled>Update</button>
+                  <button type="button" id="p-btn-delete" class="btn btn-danger btn-disabled" onclick="deletePrisoner()"
+                    disabled>Delete</button>
+                  <button type="button" id="p-btn-pdf" class="btn btn-secondary btn-disabled"
+                    onclick="generateDossier()" disabled><i data-lucide="file-text"
+                      style="width: 14px; height: 14px; margin-right: 4px;"></i> PDF</button>
+                  <button type="button" id="p-btn-clear" class="btn btn-secondary"
+                    onclick="clearPrisonerForm()">Clear</button>
+                </div>
+              </form>
+            </div>
+
+            <!-- Table Block -->
+            <div class="card table-card">
+              <div class="table-toolbar">
+                <div class="search-box">
+                  <i data-lucide="search"></i>
+                  <input type="text" id="p-search" placeholder="Search by name, ID, cell or crime..."
+                    onkeyup="loadPrisoners()">
+                </div>
+                <div class="filter-box">
+                  <label for="p-status-filter">Filter Status:</label>
+                  <select id="p-status-filter" onchange="loadPrisoners()" style="width: 130px;">
+                    <option value="All">All</option>
+                    <option value="Active">Active</option>
+                    <option value="Released">Released</option>
+                  </select>
+                </div>
+              </div>
+              <div class="table-responsive">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Photo</th>
+                      <th>ID</th>
+                      <th>Name</th>
+                      <th>Age</th>
+                      <th>Gender</th>
+                      <th>Cell</th>
+                      <th>Crime</th>
+                      <th>Entry</th>
+                      <th>Release</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody id="prisoners-table-body">
+                    <!-- Dynamic Rows -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- STAFF VIEW -->
+        <section id="view-staff" class="view-section" style="display: none;">
+
+          <!-- Read-only notice for Officer / Guard -->
+          <div id="staff-readonly-notice"
+            style="display:none; align-items:center; gap:10px; background:rgba(245,158,11,0.08); border:1px solid rgba(245,158,11,0.3); border-radius:10px; padding:12px 18px; margin-bottom:20px; font-size:13px; color:#fbbf24;">
+            <i data-lucide="lock" style="width:16px;height:16px;flex-shrink:0;"></i>
+            <span><strong>View Only</strong> — You can browse the staff directory, but only an <strong>Admin</strong>
+              can add, edit, or delete staff records.</span>
+          </div>
+
+          <div class="management-grid">
+            <!-- Form Block -->
+            <div class="card form-card">
+              <div class="card-header">
+                <h3 id="staff-form-title">Add Staff Member</h3>
+              </div>
+              <form id="staff-form" onsubmit="handleStaffSubmit(event)">
+                <input type="hidden" id="s-selected-id">
+
+                <div class="form-group">
+                  <label for="s-name">Full Name</label>
+                  <input type="text" id="s-name" placeholder="Officer Smith" required>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="s-role">System Role</label>
+                    <select id="s-role" required>
+                      <option value="Guard">Guard</option>
+                      <option value="Officer">Officer</option>
+                      <option value="Warden">Warden</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label for="s-phone">Phone Number</label>
+                    <input type="tel" id="s-phone" placeholder="10-digit number" pattern="[0-9]{10}" required>
+                  </div>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="s-shift">Shift</label>
+                    <select id="s-shift" required>
+                      <option value="Morning">Morning</option>
+                      <option value="Evening">Evening</option>
+                      <option value="Night">Night</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="s-start">Shift Start (HH:MM)</label>
+                    <input type="text" id="s-start" placeholder="08:00" required>
+                  </div>
+                  <div class="form-group">
+                    <label for="s-end">Shift End (HH:MM)</label>
+                    <input type="text" id="s-end" placeholder="16:00" required>
+                  </div>
+                </div>
+
+                <div class="form-actions">
+                  <button type="submit" id="s-btn-add" class="btn btn-primary">Add</button>
+                  <button type="button" id="s-btn-update" class="btn btn-info btn-disabled" onclick="updateStaff()"
+                    disabled>Update</button>
+                  <button type="button" id="s-btn-delete" class="btn btn-danger btn-disabled" onclick="deleteStaff()"
+                    disabled>Delete</button>
+                  <button type="button" id="s-btn-clear" class="btn btn-secondary"
+                    onclick="clearStaffForm()">Clear</button>
+                </div>
+              </form>
+            </div>
+
+            <!-- Table Block -->
+            <div class="card table-card">
+              <div class="table-toolbar">
+                <div class="search-box">
+                  <i data-lucide="search"></i>
+                  <input type="text" id="s-search" placeholder="Search by name, role, phone..." onkeyup="loadStaff()">
+                </div>
+                <div class="filter-box">
+                  <label for="s-role-filter">Filter Role:</label>
+                  <select id="s-role-filter" onchange="loadStaff()">
+                    <option value="All">All</option>
+                    <option value="Officer">Officer</option>
+                    <option value="Warden">Warden</option>
+                    <option value="Guard">Guard</option>
+                  </select>
+                </div>
+              </div>
+              <div class="table-responsive">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>Name</th>
+                      <th>Role</th>
+                      <th>Phone</th>
+                      <th>Shift</th>
+                      <th>Shift Start</th>
+                      <th>Shift End</th>
+                    </tr>
+                  </thead>
+                  <tbody id="staff-table-body">
+                    <!-- Dynamic Rows -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- VISITORS VIEW -->
+        <section id="view-visitors" class="view-section" style="display: none;">
+          <div class="management-grid">
+            <!-- Form Block -->
+            <div class="card form-card">
+              <div class="card-header">
+                <h3 id="visitor-form-title">Log Visitor Record</h3>
+              </div>
+              <form id="visitor-form" onsubmit="handleVisitorSubmit(event)">
+                <input type="hidden" id="v-selected-id">
+
+                <div class="form-group">
+                  <label for="v-name">Visitor Name</label>
+                  <input type="text" id="v-name" placeholder="Alice Smith" required>
+                </div>
+
+                <div class="form-group">
+                  <label for="v-prisoner">Prisoner ID</label>
+                  <input type="text" id="v-prisoner" placeholder="e.g. P1001" required>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="v-relation">Relationship</label>
+                    <input type="text" id="v-relation" placeholder="Spouse" required>
+                  </div>
+                  <div class="form-group">
+                    <label for="v-phone">Phone Number</label>
+                    <input type="tel" id="v-phone" placeholder="10-digit number" pattern="[0-9]{10}">
+                  </div>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="v-date">Visit Date</label>
+                    <input type="date" id="v-date" required>
+                  </div>
+                  <div class="form-group">
+                    <label for="v-time">Visit Time</label>
+                    <input type="text" id="v-time" placeholder="HH:MM" required>
+                  </div>
+                </div>
+
+                <div class="form-actions">
+                  <button type="submit" id="v-btn-add" class="btn btn-primary">Add</button>
+                  <button type="button" id="v-btn-update" class="btn btn-info btn-disabled" onclick="updateVisitor()"
+                    disabled>Update</button>
+                  <button type="button" id="v-btn-delete" class="btn btn-danger btn-disabled" onclick="deleteVisitor()"
+                    disabled>Delete</button>
+                  <button type="button" id="v-btn-clear" class="btn btn-secondary"
+                    onclick="clearVisitorForm()">Clear</button>
+                </div>
+              </form>
+            </div>
+
+            <!-- Table Block -->
+            <div class="card table-card">
+              <div class="table-toolbar">
+                <div class="search-box">
+                  <i data-lucide="search"></i>
+                  <input type="text" id="v-search" placeholder="Search by visitor, prisoner or relationship..."
+                    onkeyup="loadVisitors()">
+                </div>
+              </div>
+              <div class="table-responsive">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Visit ID</th>
+                      <th>Visitor Name</th>
+                      <th>Prisoner Details</th>
+                      <th>Relationship</th>
+                      <th>Phone</th>
+                      <th>Visit Date</th>
+                      <th>Visit Time</th>
+                    </tr>
+                  </thead>
+                  <tbody id="visitors-table-body">
+                    <!-- Dynamic Rows -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- CELLS VIEW -->
+        <section id="view-cells" class="view-section" style="display: none;">
+          <div class="management-grid">
+            <!-- Form Block -->
+            <div class="card form-card">
+              <div class="card-header">
+                <h3 id="cell-form-title">Add Cell Record</h3>
+              </div>
+              <form id="cell-form" onsubmit="handleCellSubmit(event)">
+                <input type="hidden" id="cell-selected-id">
+
+                <div class="form-group">
+                  <label for="cell-id-input">Cell ID</label>
+                  <input type="text" id="cell-id-input" placeholder="e.g. 101" required>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="cell-block-input">Block</label>
+                    <input type="text" id="cell-block-input" placeholder="e.g. A" required>
+                  </div>
+                  <div class="form-group">
+                    <label for="cell-floor-input">Floor</label>
+                    <input type="text" id="cell-floor-input" placeholder="e.g. 1" required>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label for="cell-capacity-input">Capacity</label>
+                  <input type="number" id="cell-capacity-input" min="1" placeholder="e.g. 4" required>
+                </div>
+
+                <div class="form-actions">
+                  <button type="submit" id="cell-btn-add" class="btn btn-primary">Add</button>
+                  <button type="button" id="cell-btn-update" class="btn btn-info btn-disabled" onclick="updateCell()"
+                    disabled>Update</button>
+                  <button type="button" id="cell-btn-delete" class="btn btn-danger btn-disabled" onclick="deleteCell()"
+                    disabled>Delete</button>
+                  <button type="button" id="cell-btn-clear" class="btn btn-secondary"
+                    onclick="clearCellForm()">Clear</button>
+                </div>
+              </form>
+            </div>
+
+            <!-- Table Block -->
+            <div class="card table-card">
+              <div class="table-toolbar">
+                <div class="search-box">
+                  <i data-lucide="search"></i>
+                  <input type="text" id="cell-search" placeholder="Search by cell ID or block..." onkeyup="loadCells()">
+                </div>
+              </div>
+              <div class="table-responsive">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Cell ID</th>
+                      <th>Block</th>
+                      <th>Floor</th>
+                      <th>Capacity</th>
+                      <th>Occupied</th>
+                      <th>Available</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody id="cells-table-body">
+                    <!-- Dynamic Rows -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- INCIDENTS VIEW -->
+        <section id="view-incidents" class="view-section" style="display: none;">
+          <div class="management-grid">
+            <!-- Form Block -->
+            <div class="card form-card">
+              <div class="card-header">
+                <h3 id="incident-form-title">Report incident</h3>
+              </div>
+              <form id="incident-form" onsubmit="handleIncidentSubmit(event)">
+                <input type="hidden" id="i-selected-id">
+
+                <div class="form-group">
+                  <label for="i-date">Date</label>
+                  <input type="date" id="i-date" required>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="i-type">Type</label>
+                    <select id="i-type" required>
+                      <option value="Fight">Fight</option>
+                      <option value="Contraband">Contraband</option>
+                      <option value="Escape Attempt">Escape Attempt</option>
+                      <option value="Medical">Medical</option>
+                      <option value="Property Damage">Property Damage</option>
+                      <option value="Disciplinary">Disciplinary</option>
+                      <option value="Security Breach">Security Breach</option>
+                      <option value="Other">Other</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label for="i-location">Location</label>
+                    <input type="text" id="i-location" placeholder="Yard, Cell C-12, etc." required>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label for="i-prisoner">Prisoner ID (Optional)</label>
+                  <input type="text" id="i-prisoner" placeholder="e.g. P1001">
+                </div>
+
+                <div class="form-group">
+                  <label for="i-status">Status</label>
+                  <select id="i-status" required>
+                    <option value="Open">Open</option>
+                    <option value="Under Investigation">Under Investigation</option>
+                    <option value="Resolved">Resolved</option>
+                    <option value="Closed">Closed</option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label for="i-description">Description</label>
+                  <textarea id="i-description" placeholder="Incident details..."
+                    style="width:100%; height:80px; background:rgba(30, 41, 59, 0.5); border:1px solid var(--border-color); border-radius:var(--radius-md); padding:10px; color:white; outline:none; resize:none;"></textarea>
+                </div>
+
+                <div class="form-actions">
+                  <button type="submit" id="i-btn-add" class="btn btn-primary">Report</button>
+                  <button type="button" id="i-btn-update" class="btn btn-info btn-disabled" onclick="updateIncident()"
+                    disabled>Update</button>
+                  <button type="button" id="i-btn-delete" class="btn btn-danger btn-disabled" onclick="deleteIncident()"
+                    disabled>Delete</button>
+                  <button type="button" id="i-btn-clear" class="btn btn-secondary"
+                    onclick="clearIncidentForm()">Clear</button>
+                </div>
+              </form>
+            </div>
+
+            <!-- Table Block -->
+            <div class="card table-card">
+              <div class="table-toolbar">
+                <div class="search-box">
+                  <i data-lucide="search"></i>
+                  <input type="text" id="i-search" placeholder="Search incidents..." onkeyup="loadIncidents()">
+                </div>
+              </div>
+              <div class="table-responsive">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Incident ID</th>
+                      <th>Date</th>
+                      <th>Type</th>
+                      <th>Location</th>
+                      <th>Prisoner</th>
+                      <th>Status</th>
+                      <th>Reporter</th>
+                    </tr>
+                  </thead>
+                  <tbody id="incidents-table-body">
+                    <!-- Dynamic Rows -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- REPORTS VIEW -->
+        <section id="view-reports" class="view-section" style="display: none;">
+          <div class="stats-grid">
+            <div
+              style="background:var(--bg-card); padding:20px; border:1px solid var(--border-color); border-radius:var(--radius-lg); text-align:center;">
+              <h3 style="font-size:14px; color:var(--text-secondary);">Prisoners</h3>
+              <p class="stat-value" id="report-stat-prisoners" style="margin-top:10px;">0</p>
+              <button class="btn btn-primary btn-block" style="margin-top:15px; font-size:12px; padding:8px;"
+                onclick="exportCSV('prisoners')">Export CSV</button>
+            </div>
+            <div
+              style="background:var(--bg-card); padding:20px; border:1px solid var(--border-color); border-radius:var(--radius-lg); text-align:center;">
+              <h3 style="font-size:14px; color:var(--text-secondary);">Staff Directory</h3>
+              <p class="stat-value" id="report-stat-staff" style="margin-top:10px;">0</p>
+              <button class="btn btn-primary btn-block" style="margin-top:15px; font-size:12px; padding:8px;"
+                onclick="exportCSV('staff')">Export CSV</button>
+            </div>
+            <div
+              style="background:var(--bg-card); padding:20px; border:1px solid var(--border-color); border-radius:var(--radius-lg); text-align:center;">
+              <h3 style="font-size:14px; color:var(--text-secondary);">Visitation logs</h3>
+              <p class="stat-value" id="report-stat-visitors" style="margin-top:10px;">0</p>
+              <button class="btn btn-primary btn-block" style="margin-top:15px; font-size:12px; padding:8px;"
+                onclick="exportCSV('visitors')">Export CSV</button>
+            </div>
+            <div
+              style="background:var(--bg-card); padding:20px; border:1px solid var(--border-color); border-radius:var(--radius-lg); text-align:center;">
+              <h3 style="font-size:14px; color:var(--text-secondary);">Cells Matrix</h3>
+              <p class="stat-value" id="report-stat-cells" style="margin-top:10px;">0</p>
+              <button class="btn btn-primary btn-block" style="margin-top:15px; font-size:12px; padding:8px;"
+                onclick="exportCSV('cells')">Export CSV</button>
+            </div>
+            <div
+              style="background:var(--bg-card); padding:20px; border:1px solid var(--border-color); border-radius:var(--radius-lg); text-align:center;">
+              <h3 style="font-size:14px; color:var(--text-secondary);">Incident logs</h3>
+              <p class="stat-value" id="report-stat-incidents" style="margin-top:10px;">0</p>
+              <button class="btn btn-primary btn-block" style="margin-top:15px; font-size:12px; padding:8px;"
+                onclick="exportCSV('incidents')">Export CSV</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- SECURITY AUDIT LOGS VIEW -->
+        <section id="view-logs" class="view-section" style="display: none;">
+          <div class="card table-card" style="padding: 24px;">
+            <div class="table-toolbar" style="border: none; padding: 0 0 20px 0;">
+              <h3>System Access and Modification Logs</h3>
+              <button class="btn btn-secondary" onclick="loadAuditLogs()">
+                <i data-lucide="refresh-cw" class="btn-icon"></i>
+                <span>Refresh Logs</span>
+              </button>
+            </div>
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Username</th>
+                    <th>Action</th>
+                    <th>Details</th>
+                    <th>Timestamp</th>
+                  </tr>
+                </thead>
+                <tbody id="logs-table-body">
+                  <!-- Dynamic Rows -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- DOSSIER MODAL & PREVIEW -->
+  <div id="dossier-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(7, 11, 25, 0.88); backdrop-filter: blur(8px); z-index: 99999; overflow-y: auto; padding: 25px 10px; box-sizing: border-box;">
+    <div style="max-width: 840px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; gap: 14px;">
+      
+      <!-- Top Action Toolbar -->
+      <div style="width: 100%; max-width: 800px; display: flex; justify-content: space-between; align-items: center; background: #0f172a; border: 1px solid rgba(139, 92, 246, 0.4); border-radius: 12px; padding: 12px 20px; box-sizing: border-box; box-shadow: 0 10px 30px rgba(0,0,0,0.6);">
+        <div style="display: flex; align-items: center; gap: 10px; color: #f8fafc;">
+          <div style="width: 32px; height: 32px; border-radius: 8px; background: rgba(139, 92, 246, 0.2); display: flex; align-items: center; justify-content: center;">
+            <i data-lucide="file-text" style="width: 18px; height: 18px; color: #a855f7;"></i>
+          </div>
+          <div>
+            <h4 style="margin: 0; font-size: 15px; font-weight: 700; color: #ffffff;" id="modal-dossier-title">Inmate Dossier Preview</h4>
+            <p style="margin: 2px 0 0 0; font-size: 11px; color: #94a3b8;">High-resolution printable document</p>
+          </div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <button type="button" id="modal-download-btn" onclick="downloadDossierPDF()" class="btn btn-primary" style="padding: 8px 16px; font-size: 13px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; border-radius: 8px; cursor: pointer;">
+            <i data-lucide="download" style="width: 15px; height: 15px;"></i>
+            <span>Download PDF</span>
+          </button>
+          <button type="button" onclick="printDossier()" class="btn btn-info" style="padding: 8px 16px; font-size: 13px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; border-radius: 8px; cursor: pointer;">
+            <i data-lucide="printer" style="width: 15px; height: 15px;"></i>
+            <span>Print</span>
+          </button>
+          <button type="button" onclick="closeDossierModal()" class="btn btn-secondary" style="padding: 8px 14px; font-size: 13px; display: inline-flex; align-items: center; gap: 5px; border-radius: 8px; cursor: pointer;">
+            <i data-lucide="x" style="width: 15px; height: 15px;"></i>
+            <span>Close</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Dossier Container Preview -->
+      <div id="dossier-preview-wrapper" style="box-shadow: 0 25px 60px rgba(0,0,0,0.7); border-radius: 12px; overflow: hidden; background: #ffffff;">
+        <div id="dossier-template"
+    style="width: 800px; height: 960px; background: #ffffff; color: #1e293b; font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; box-sizing: border-box; border: 1.5px solid #818cf8; border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; position: relative;">
+
+    <!-- Watermark Background -->
+    <div
+      style="position: absolute; top: 400px; left: 50%; transform: translate(-50%, -50%); opacity: 0.035; pointer-events: none; z-index: 0;">
+      <svg xmlns="http://www.w3.org/2000/svg" width="380" height="420" viewBox="0 0 24 24" fill="#8b5cf6">
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+        <circle cx="12" cy="11" r="3"></circle>
+        <path d="M12 14v3"></path>
+      </svg>
+    </div>
+
+    <!-- 1. Top Header -->
+    <div style="z-index: 1;">
+      <div
+        style="background-color: #070b19; color: white; padding: 20px 35px; display: flex; justify-content: space-between; align-items: center;">
+        <!-- Left side: Logo and Title -->
+        <div style="display: flex; align-items: center; gap: 18px;">
+          <div
+            style="width: 44px; height: 44px; border: 2px solid #8b5cf6; border-radius: 12px; display: flex; align-items: center; justify-content: center; background: rgba(139, 92, 246, 0.1);">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+              stroke="#a855f7" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+              <circle cx="12" cy="11" r="3"></circle>
+              <path d="M12 14v3"></path>
+            </svg>
+          </div>
+          <h1 style="margin: 0; font-size: 28px; font-weight: 800; color: #818cf8; letter-spacing: 1.5px;">JMS</h1>
+          <div style="width: 1px; height: 40px; background: rgba(255, 255, 255, 0.2); margin: 0 4px;"></div>
+          <div>
+            <h2 style="margin: 0; font-size: 20px; font-weight: 800; color: #ffffff; letter-spacing: 0.5px;">INMATE / PRISONER RECORD</h2>
+            <p style="margin: 3px 0 0 0; font-size: 12px; color: #94a3b8;">Jail Management System &nbsp;&bull;&nbsp; Confidential Record</p>
+          </div>
+        </div>
+
+        <!-- Right side: Status and ID -->
+        <div
+          style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 10px; padding: 10px 18px; display: flex; flex-direction: column; gap: 6px;">
+          <div
+            style="display: flex; justify-content: space-between; align-items: center; gap: 15px; font-size: 11px; font-weight: 600; color: #94a3b8;">
+            <span>RECORD ID:</span>
+            <span id="dossier-header-id" style="color: #38bdf8; font-weight: 800; font-size: 14px;">P1003</span>
+          </div>
+          <div
+            style="display: flex; justify-content: space-between; align-items: center; gap: 15px; font-size: 11px; font-weight: 600; color: #94a3b8;">
+            <span>STATUS:</span>
+            <span id="dossier-header-status"
+              style="background-color: #ef4444; color: white; padding: 2px 10px; border-radius: 12px; font-weight: 800; font-size: 11px; letter-spacing: 0.5px;">ACTIVE</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Gradient accent line -->
+      <div style="height: 3.5px; background: linear-gradient(90deg, #6366f1 0%, #06b6d4 50%, #a855f7 100%);"></div>
+
+      <!-- Meta info: Generated by & Date -->
+      <div style="text-align: right; padding: 8px 35px 2px 35px; font-size: 11.5px; color: #475569; font-weight: 500;">
+        Generated by: <span id="dossier-gen-officer" style="font-weight: 600;">Officer</span> &nbsp;&bull;&nbsp; Date: <span
+          id="dossier-gen-date" style="font-weight: 600;">06 September 2026</span>
+      </div>
+    </div>
+
+    <!-- 2. Main Profile Block: Mugshot + Details -->
+    <div style="padding: 6px 35px 0 35px; display: flex; gap: 35px; align-items: stretch; z-index: 1;">
+      <!-- Photo with Height Chart -->
+      <div
+        style="width: 215px; height: 260px; border: 2px solid #818cf8; border-radius: 12px; overflow: hidden; position: relative; background: #f8fafc; flex-shrink: 0;">
+        <!-- Height lines backdrop -->
+        <div
+          style="position: absolute; width: 100%; height: 100%; top: 0; left: 0; display: flex; flex-direction: column; justify-content: space-between; padding: 10px 0; box-sizing: border-box; pointer-events: none; z-index: 1;">
+          <div style="border-bottom: 1px solid rgba(148, 163, 184, 0.4); padding-left: 8px; font-size: 9.5px; font-weight: 700; color: #64748b;">6'0"</div>
+          <div style="border-bottom: 1px solid rgba(148, 163, 184, 0.4); padding-left: 8px; font-size: 9.5px; font-weight: 700; color: #64748b;">5'6"</div>
+          <div style="border-bottom: 1px solid rgba(148, 163, 184, 0.4); padding-left: 8px; font-size: 9.5px; font-weight: 700; color: #64748b;">5'0"</div>
+          <div style="border-bottom: 1px solid rgba(148, 163, 184, 0.4); padding-left: 8px; font-size: 9.5px; font-weight: 700; color: #64748b;">4'6"</div>
+          <div style="border-bottom: 1px solid rgba(148, 163, 184, 0.4); padding-left: 8px; font-size: 9.5px; font-weight: 700; color: #64748b;">4'0"</div>
+        </div>
+        <img id="dossier-photo" src="" alt="Mugshot"
+          style="position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; height: 100%; object-fit: cover; z-index: 2;">
+      </div>
+
+      <!-- Info Details (7 Fields with Purple Outline Icons) -->
+      <div style="flex: 1; display: flex; flex-direction: column; justify-content: space-between; padding: 2px 0;">
+
+        <!-- Full Name -->
+        <div style="display: flex; align-items: center; border-bottom: 1px dotted #cbd5e1; padding-bottom: 6px;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+            stroke="#8b5cf6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+            style="margin-right: 14px; flex-shrink: 0;">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+            <circle cx="12" cy="7" r="4" />
+          </svg>
+          <span style="width: 135px; color: #475569; font-size: 13px; font-weight: 500;">Full Name</span>
+          <span style="color: #64748b; margin-right: 14px;">:</span>
+          <strong id="dossier-name" style="font-size: 15px; color: #0f172a; font-weight: 700;">N/A</strong>
+        </div>
+
+        <!-- Prisoner ID -->
+        <div style="display: flex; align-items: center; border-bottom: 1px dotted #cbd5e1; padding-bottom: 6px;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+            stroke="#8b5cf6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+            style="margin-right: 14px; flex-shrink: 0;">
+            <rect x="3" y="4" width="18" height="16" rx="2" />
+            <circle cx="9" cy="10" r="2" />
+            <line x1="15" y1="8" x2="17" y2="8" />
+            <line x1="15" y1="12" x2="17" y2="12" />
+            <line x1="7" y1="16" x2="17" y2="16" />
+          </svg>
+          <span style="width: 135px; color: #475569; font-size: 13px; font-weight: 500;">Prisoner ID</span>
+          <span style="color: #64748b; margin-right: 14px;">:</span>
+          <strong id="dossier-id" style="font-size: 15px; color: #0f172a; font-weight: 700;">N/A</strong>
+        </div>
+
+        <!-- Age -->
+        <div style="display: flex; align-items: center; border-bottom: 1px dotted #cbd5e1; padding-bottom: 6px;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+            stroke="#8b5cf6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+            style="margin-right: 14px; flex-shrink: 0;">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+            <line x1="16" y1="2" x2="16" y2="6" />
+            <line x1="8" y1="2" x2="8" y2="6" />
+            <line x1="3" y1="10" x2="21" y2="10" />
+          </svg>
+          <span style="width: 135px; color: #475569; font-size: 13px; font-weight: 500;">Age</span>
+          <span style="color: #64748b; margin-right: 14px;">:</span>
+          <strong id="dossier-age" style="font-size: 15px; color: #0f172a; font-weight: 700;">N/A</strong>
+        </div>
+
+        <!-- Gender -->
+        <div style="display: flex; align-items: center; border-bottom: 1px dotted #cbd5e1; padding-bottom: 6px;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+            stroke="#8b5cf6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+            style="margin-right: 14px; flex-shrink: 0;">
+            <circle cx="12" cy="8" r="5" />
+            <line x1="12" y1="13" x2="12" y2="21" />
+            <line x1="9" y1="17" x2="15" y2="17" />
+          </svg>
+          <span style="width: 135px; color: #475569; font-size: 13px; font-weight: 500;">Gender</span>
+          <span style="color: #64748b; margin-right: 14px;">:</span>
+          <strong id="dossier-gender" style="font-size: 15px; color: #0f172a; font-weight: 700;">N/A</strong>
+        </div>
+
+        <!-- Cell -->
+        <div style="display: flex; align-items: center; border-bottom: 1px dotted #cbd5e1; padding-bottom: 6px;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+            stroke="#8b5cf6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+            style="margin-right: 14px; flex-shrink: 0;">
+            <path d="M3 21h18M6 21V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v16" />
+            <circle cx="14" cy="12" r="1" />
+          </svg>
+          <span style="width: 135px; color: #475569; font-size: 13px; font-weight: 500;">Cell</span>
+          <span style="color: #64748b; margin-right: 14px;">:</span>
+          <strong id="dossier-cell" style="font-size: 15px; color: #0f172a; font-weight: 700;">N/A</strong>
+        </div>
+
+        <!-- Block -->
+        <div style="display: flex; align-items: center; border-bottom: 1px dotted #cbd5e1; padding-bottom: 6px;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+            stroke="#8b5cf6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+            style="margin-right: 14px; flex-shrink: 0;">
+            <rect x="4" y="2" width="16" height="20" rx="2" ry="2" />
+            <line x1="9" y1="22" x2="9" y2="22.01" />
+            <line x1="15" y1="22" x2="15" y2="22.01" />
+            <line x1="9" y1="6" x2="9" y2="6.01" />
+            <line x1="15" y1="6" x2="15" y2="6.01" />
+            <line x1="9" y1="10" x2="9" y2="10.01" />
+            <line x1="15" y1="10" x2="15" y2="10.01" />
+            <line x1="9" y1="14" x2="9" y2="14.01" />
+            <line x1="15" y1="14" x2="15" y2="14.01" />
+            <line x1="9" y1="18" x2="9" y2="18.01" />
+            <line x1="15" y1="18" x2="15" y2="18.01" />
+          </svg>
+          <span style="width: 135px; color: #475569; font-size: 13px; font-weight: 500;">Block</span>
+          <span style="color: #64748b; margin-right: 14px;">:</span>
+          <strong id="dossier-block" style="font-size: 15px; color: #0f172a; font-weight: 700;">N/A</strong>
+        </div>
+
+        <!-- Crime / Charge -->
+        <div style="display: flex; align-items: center;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+            stroke="#8b5cf6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+            style="margin-right: 14px; flex-shrink: 0;">
+            <path d="M12 3v18" />
+            <path d="m3 7 4 9h10l4-9" />
+            <path d="M7 16h10" />
+          </svg>
+          <span style="width: 135px; color: #475569; font-size: 13px; font-weight: 500;">Crime / Charge</span>
+          <span style="color: #64748b; margin-right: 14px;">:</span>
+          <strong id="dossier-crime" style="font-size: 15px; color: #0f172a; font-weight: 700;">N/A</strong>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. Dates & Sentence Summary Row (4 Columns) -->
+    <div
+      style="border: 1.5px solid #818cf8; border-radius: 12px; margin: 10px 35px 0 35px; padding: 12px 10px; display: grid; grid-template-columns: repeat(4, 1fr); background: #ffffff; text-align: center; z-index: 1;">
+      <!-- Entry Date -->
+      <div style="border-right: 1px solid #cbd5e1; padding: 0 5px;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"
+          stroke="#8b5cf6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+          style="margin: 0 auto 5px auto; display: block;">
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+          <line x1="16" y1="2" x2="16" y2="6" />
+          <line x1="8" y1="2" x2="8" y2="6" />
+          <line x1="3" y1="10" x2="21" y2="10" />
+        </svg>
+        <div style="color: #64748b; font-size: 11px; font-weight: 700; margin-bottom: 3px; letter-spacing: 0.5px;">ENTRY DATE</div>
+        <strong id="dossier-entry" style="font-size: 15px; color: #0f172a; font-weight: 800;">30 August 2026</strong>
+      </div>
+
+      <!-- Sentence -->
+      <div style="border-right: 1px solid #cbd5e1; padding: 0 5px;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"
+          stroke="#8b5cf6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+          style="margin: 0 auto 5px auto; display: block;">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+          <polyline points="14 2 14 8 20 8" />
+          <line x1="16" y1="13" x2="8" y2="13" />
+          <line x1="16" y1="17" x2="8" y2="17" />
+        </svg>
+        <div style="color: #64748b; font-size: 11px; font-weight: 700; margin-bottom: 3px; letter-spacing: 0.5px;">SENTENCE</div>
+        <strong id="dossier-sentence" style="font-size: 15px; color: #0f172a; font-weight: 800;">8 Years</strong>
+      </div>
+
+      <!-- Release Date -->
+      <div style="border-right: 1px solid #cbd5e1; padding: 0 5px;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"
+          stroke="#8b5cf6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+          style="margin: 0 auto 5px auto; display: block;">
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+          <line x1="16" y1="2" x2="16" y2="6" />
+          <line x1="8" y1="2" x2="8" y2="6" />
+          <line x1="3" y1="10" x2="21" y2="10" />
+        </svg>
+        <div style="color: #64748b; font-size: 11px; font-weight: 700; margin-bottom: 3px; letter-spacing: 0.5px;">RELEASE DATE</div>
+        <strong id="dossier-release" style="font-size: 15px; color: #0f172a; font-weight: 800;">28 August 2034</strong>
+      </div>
+
+      <!-- Remaining Status -->
+      <div style="padding: 0 5px;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"
+          stroke="#8b5cf6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+          style="margin: 0 auto 5px auto; display: block;">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+          <polyline points="9 11 12 14 22 4" />
+        </svg>
+        <div style="color: #64748b; font-size: 11px; font-weight: 700; margin-bottom: 3px; letter-spacing: 0.5px;">REMAINING STATUS</div>
+        <strong id="dossier-summary-status"
+          style="font-size: 16px; font-weight: 800; color: #ef4444; letter-spacing: 0.5px;">ACTIVE</strong>
+      </div>
+    </div>
+
+    <!-- 4. Emergency Contact Box -->
+    <div style="border: 1.5px solid #818cf8; border-radius: 10px; margin: 10px 35px 0 35px; overflow: hidden; background: #ffffff; z-index: 1;">
+      <div
+        style="background: #070b19; color: #ffffff; padding: 5px 16px; border-bottom-right-radius: 14px; display: inline-flex; align-items: center; gap: 8px; font-size: 11px; font-weight: 700; letter-spacing: 0.5px;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none"
+          stroke="#818cf8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path
+            d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
+        </svg>
+        EMERGENCY CONTACT
+      </div>
+      <div style="padding: 10px 25px; display: flex; gap: 60px;">
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"
+            stroke="#8b5cf6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+            <circle cx="12" cy="7" r="4" />
+          </svg>
+          <div>
+            <div style="font-size: 11px; color: #64748b; font-weight: 500;">Contact Name</div>
+            <strong id="dossier-contact" style="font-size: 14px; color: #0f172a; font-weight: 700;">Raj Singh</strong>
+          </div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"
+            stroke="#8b5cf6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path
+              d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
+          </svg>
+          <div>
+            <div style="font-size: 11px; color: #64748b; font-weight: 500;">Contact Phone</div>
+            <strong id="dossier-phone" style="font-size: 14px; color: #0f172a; font-weight: 700;">10-digit phone number</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5. Custody Information Box -->
+    <div style="border: 1.5px solid #818cf8; border-radius: 10px; margin: 10px 35px 0 35px; overflow: hidden; background: #ffffff; z-index: 1;">
+      <div
+        style="background: #070b19; color: #ffffff; padding: 5px 16px; border-bottom-right-radius: 14px; display: inline-flex; align-items: center; gap: 8px; font-size: 11px; font-weight: 700; letter-spacing: 0.5px;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none"
+          stroke="#818cf8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 21h18M6 21V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v16" />
+          <line x1="6" y1="9" x2="18" y2="9" />
+          <line x1="6" y1="13" x2="18" y2="13" />
+          <line x1="6" y1="17" x2="18" y2="17" />
+        </svg>
+        CUSTODY INFORMATION
+      </div>
+      <div style="padding: 10px 25px; display: grid; grid-template-columns: 1fr 1fr 1fr; align-items: center;">
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"
+            stroke="#8b5cf6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 21h18M6 21V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v16" />
+            <circle cx="14" cy="12" r="1" />
+          </svg>
+          <div>
+            <div style="font-size: 11px; color: #64748b; font-weight: 500;">Cell</div>
+            <strong id="dossier-info-cell" style="font-size: 14px; color: #0f172a; font-weight: 700;">A101</strong>
+          </div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 12px; border-left: 1px solid #e2e8f0; padding-left: 20px;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"
+            stroke="#8b5cf6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="4" y="2" width="16" height="20" rx="2" ry="2" />
+            <line x1="9" y1="22" x2="9" y2="22.01" />
+            <line x1="15" y1="22" x2="15" y2="22.01" />
+            <line x1="9" y1="6" x2="9" y2="6.01" />
+            <line x1="15" y1="6" x2="15" y2="6.01" />
+            <line x1="9" y1="10" x2="9" y2="10.01" />
+            <line x1="15" y1="10" x2="15" y2="10.01" />
+          </svg>
+          <div>
+            <div style="font-size: 11px; color: #64748b; font-weight: 500;">Block</div>
+            <strong id="dossier-info-block" style="font-size: 14px; color: #0f172a; font-weight: 700;">A</strong>
+          </div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 12px; border-left: 1px solid #e2e8f0; padding-left: 20px;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"
+            stroke="#8b5cf6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+            <polyline points="9 11 12 14 22 4" />
+          </svg>
+          <div>
+            <div style="font-size: 11px; color: #64748b; font-weight: 500;">Current Status</div>
+            <strong id="dossier-info-status"
+              style="font-size: 14px; font-weight: 800; color: #ef4444; letter-spacing: 0.5px;">ACTIVE</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6. Record Notes Box -->
+    <div style="border: 1.5px solid #818cf8; border-radius: 10px; margin: 10px 35px 0 35px; overflow: hidden; background: #ffffff; z-index: 1;">
+      <div
+        style="background: #070b19; color: #ffffff; padding: 5px 16px; border-bottom-right-radius: 14px; display: inline-flex; align-items: center; gap: 8px; font-size: 11px; font-weight: 700; letter-spacing: 0.5px;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none"
+          stroke="#818cf8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+          <polyline points="14 2 14 8 20 8" />
+          <line x1="16" y1="13" x2="8" y2="13" />
+          <line x1="16" y1="17" x2="8" y2="17" />
+        </svg>
+        RECORD NOTES
+      </div>
+      <div style="padding: 8px 25px 10px 25px;">
+        <ul style="margin: 0; padding-left: 20px; font-size: 11.5px; color: #1e293b; line-height: 1.6;">
+          <li style="color: #8b5cf6;"><span style="color: #1e293b;">Inmate is to be monitored as per prison safety protocols.</span></li>
+          <li style="color: #8b5cf6;"><span style="color: #1e293b;">Maintain regular health checkups and behavioral observation.</span></li>
+          <li style="color: #8b5cf6;"><span style="color: #1e293b;">Report any unusual activity to the duty officer immediately.</span></li>
+        </ul>
+      </div>
+    </div>
+
+
+
+    <!-- 8. Bottom Bar -->
+    <div
+      style="background: #070b19; color: #94a3b8; padding: 10px 35px; border-top: 3.5px solid #818cf8; display: flex; justify-content: space-between; align-items: center; font-size: 11px; margin-top: auto; z-index: 1;">
+      <div><strong style="color: #a855f7;">JMS</strong> &mdash; Jail Management System &nbsp;|&nbsp; Confidential
+        &nbsp;|&nbsp; For authorized personnel only</div>
+      <div>Page 1 of 1</div>
+    </div>
+  </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+// Global State
+let currentView = 'dashboard';
+let overviewChart = null;
+let selectedPrisonerId = null;
+let selectedStaffId = null;
+let selectedVisitorId = null;
+let selectedCellId = null;
+let selectedIncidentId = null;
+
+// Clock update
+function startLiveClock() {
+    const clockEl = document.getElementById('live-clock');
+    if (!clockEl) return;
+    function update() {
+        const now = new Date();
+        clockEl.textContent = now.toLocaleString();
+    }
+    update();
+    setInterval(update, 1000);
+}
+
+// Toast Notifications
+function showToast(title, message, type = 'success') {
+    const container = document.getElementById('toast-container');
+    if (!container) return;
+    const toast = document.createElement('div');
+    toast.className = `toast toast-${type}`;
+    const icon = type === 'success' ? 'check-circle' : 'alert-circle';
+    toast.innerHTML = `
+    <div class="toast-icon"><i data-lucide="${icon}"></i></div>
+    <div class="toast-content">
+      <div class="toast-title">${title}</div>
+      <div class="toast-message">${message}</div>
+    </div>
+  `;
+    container.appendChild(toast);
+    if (window.lucide) window.lucide.createIcons();
+    setTimeout(() => {
+        toast.style.transform = 'translateX(120%)';
+        toast.style.opacity = '0';
+        setTimeout(() => toast.remove(), 300);
+    }, 4000);
+}
+
+// Check and Update UI permissions based on Role
+function applyRolePermissions(user) {
+    const avatar = document.getElementById('sidebar-avatar');
+    const usrName = document.getElementById('sidebar-username');
+    const roleEl = document.getElementById('sidebar-role');
+    if (avatar && user.username) avatar.textContent = user.username[0].toUpperCase();
+    if (usrName) usrName.textContent = user.username;
+    if (roleEl) roleEl.textContent = user.role;
+
+    const showForAdmin = (user.role === 'Admin') ? 'block' : 'none';
+    const showForOfficerAdmin = (['Admin', 'Officer', 'Warden'].includes(user.role)) ? 'block' : 'none';
+
+    // Toggle nav buttons
+    // Staff: visible to ALL roles (view-only for Officer/Guard/Warden, editable for Admin)
+    const navStaff = document.getElementById('nav-staff-item');
+    const navPrisoners = document.getElementById('nav-prisoners-item');
+    const navLogs = document.getElementById('nav-logs-item');
+    const navApprovals = document.getElementById('nav-approvals-item');
+
+    if (navStaff) navStaff.style.display = 'block';    // Everyone can see Staff
+    if (navLogs) navLogs.style.display = showForAdmin;
+    if (navApprovals) navApprovals.style.display = showForAdmin;
+    if (navPrisoners) navPrisoners.style.display = showForOfficerAdmin;
+
+    // Toggle edit/delete buttons inside panels (Staff form = Admin only)
+    toggleFormActionButtons('p', user.role, ['Admin', 'Officer', 'Warden']);
+    toggleFormActionButtons('s', user.role, ['Admin']);
+    toggleFormActionButtons('cell', user.role, ['Admin']);
+    toggleFormActionButtons('i', user.role, ['Admin', 'Officer', 'Warden']);
+    toggleFormActionButtons('v', user.role, ['Admin', 'Officer', 'Warden', 'Guard']);
+
+    // Show a read-only notice on Staff page for non-Admin
+    const staffReadonlyNotice = document.getElementById('staff-readonly-notice');
+    if (staffReadonlyNotice) {
+        staffReadonlyNotice.style.display = (user.role !== 'Admin') ? 'flex' : 'none';
+    }
+
+    // Hide delete buttons specifically if not Admin
+    if (user.role !== 'Admin') {
+        const pDel = document.getElementById('p-btn-delete');
+        const vDel = document.getElementById('v-btn-delete');
+        const iDel = document.getElementById('i-btn-delete');
+        if (pDel) pDel.style.display = 'none';
+        if (vDel) vDel.style.display = 'none';
+        if (iDel) iDel.style.display = 'none';
+    }
+}
+
+function toggleFormActionButtons(prefix, userRole, allowedRoles) {
+    const isAllowed = allowedRoles.includes(userRole);
+    const btns = [
+        document.getElementById(`${prefix}-btn-add`),
+        document.getElementById(`${prefix}-btn-update`),
+        document.getElementById(`${prefix}-btn-delete`),
+        document.getElementById(`${prefix}-btn-clear`)
+    ];
+
+    btns.forEach(btn => {
+        if (btn) {
+            btn.style.display = isAllowed ? 'inline-block' : 'none';
+        }
+    });
+}
+
+// Check Auth Session
+function checkSession() {
+    const session = localStorage.getItem('jms_user');
+    const authView = document.getElementById('auth-view');
+    const appView = document.getElementById('app-view');
+    if (session) {
+        const user = JSON.parse(session);
+        authView.style.display = 'none';
+        appView.style.display = 'flex';
+        applyRolePermissions(user);
+        switchView(currentView || 'dashboard');
+        loadMyProfile();
+    } else {
+        authView.style.display = 'flex';
+        appView.style.display = 'none';
+    }
+}
+
+// Header authorization helper
+function getAuthHeaders() {
+    const session = localStorage.getItem('jms_user');
+    if (!session) return { 'Content-Type': 'application/json' };
+    const user = JSON.parse(session);
+    return {
+        'Content-Type': 'application/json',
+        'X-User-Role': user.role,
+        'X-User-Name': user.username
+    };
+}
+
+// Authentication Forms Toggle
+let isSignUpMode = false;
+function toggleAuthMode() {
+    isSignUpMode = !isSignUpMode;
+    const subtitle = document.getElementById('auth-subtitle');
+    const submitBtn = document.querySelector('#auth-submit-btn span');
+    const toggleBtn = document.getElementById('auth-toggle-btn');
+    const toggleMsg = document.getElementById('auth-toggle-msg');
+    const adminNotice = document.getElementById('admin-notice');
+    const roleGroup = document.getElementById('role-group');
+    const phoneGroup = document.getElementById('phone-group');
+    const emailGroup = document.getElementById('email-group');
+    const forgotWrap = document.getElementById('forgot-link-wrap');
+    document.getElementById('auth-form').reset();
+
+    if (isSignUpMode) {
+        subtitle.textContent = 'Create an account to register';
+        submitBtn.textContent = 'Sign Up';
+        toggleBtn.textContent = 'Login';
+        toggleMsg.textContent = 'Already have an account?';
+        adminNotice.style.display = 'flex';
+        if (roleGroup) roleGroup.style.display = 'block';
+        if (phoneGroup) phoneGroup.style.display = 'block';
+        if (emailGroup) emailGroup.style.display = 'block';
+        if (forgotWrap) forgotWrap.style.display = 'none';
+    } else {
+        subtitle.textContent = 'Login to access your dashboard';
+        submitBtn.textContent = 'Login';
+        toggleBtn.textContent = 'Sign Up';
+        toggleMsg.textContent = "Don't have an account?";
+        adminNotice.style.display = 'none';
+        if (roleGroup) roleGroup.style.display = 'none';
+        if (phoneGroup) phoneGroup.style.display = 'none';
+        if (emailGroup) emailGroup.style.display = 'none';
+        if (forgotWrap) forgotWrap.style.display = 'block';
+    }
+}
+
+// Handle Authentication Submit
+async function handleAuthSubmit(event) {
+    event.preventDefault();
+    const username = document.getElementById('auth-username').value.trim();
+    const password = document.getElementById('auth-password').value;
+    const roleEl = document.getElementById('auth-role');
+    const phoneEl = document.getElementById('auth-phone');
+    const emailEl = document.getElementById('auth-email');
+    const selectedRole = roleEl ? roleEl.value : 'Officer';
+    const phone = phoneEl ? phoneEl.value.trim() : '';
+    const email = emailEl ? emailEl.value.trim() : '';
+    const endpoint = isSignUpMode ? '/api/auth/signup' : '/api/auth/login';
+
+    // Phone validation for signup
+    if (isSignUpMode && phone && (!/^\d{10}$/.test(phone))) {
+        showToast('Validation Error', 'Phone number must be exactly 10 digits', 'error');
+        return;
+    }
+
+    const body = isSignUpMode
+        ? { username, password, role: selectedRole, phone: phone || '0000000000', email }
+        : { username, password };
+
+    try {
+        const response = await fetch(endpoint, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+        });
+        let result;
+        const contentType = response.headers.get('content-type') || '';
+        if (contentType.includes('application/json')) {
+            result = await response.json();
+        } else {
+            const rawText = await response.text();
+            try {
+                result = JSON.parse(rawText);
+            } catch (e) {
+                throw new Error(response.status === 405 ? 'Server path error (405). Please refresh.' : `Server error (${response.status})`);
+            }
+        }
+
+        // Special handling for account lockout (HTTP 423)
+        if (response.status === 423) {
+            showToast('Account Locked 🔒', result.error, 'error');
+            return;
+        }
+
+        if (!response.ok) throw new Error(result.error || 'Auth failed');
+
+        if (isSignUpMode) {
+            showToast('Registration Successful', `${result.message} — Role: ${result.role}`, 'success');
+            toggleAuthMode();
+        } else {
+            localStorage.setItem('jms_user', JSON.stringify({
+                username: result.username,
+                role: result.role
+            }));
+            showToast('Login Successful', `Welcome, ${result.username}! (${result.role})`, 'success');
+            checkSession();
+            loadMyProfile();
+        }
+    } catch (error) {
+        showToast('Auth Error', error.message, 'error');
+    }
+}
+
+// Log Out
+function logout() {
+    localStorage.removeItem('jms_user');
+    // Hide profile card
+    const card = document.getElementById('my-profile-card');
+    if (card) card.style.display = 'none';
+    showToast('Logged Out', 'Successfully logged out', 'success');
+    checkSession();
+}
+
+// ═══════════════════════════════════════════════════════════
+// FORGOT PASSWORD — OTP Email Flow (3 Steps)
+// ═══════════════════════════════════════════════════════════
+let fpEmail = '';
+
+function showForgotPanel() {
+    document.getElementById('auth-form').style.display = 'none';
+    const fl = document.getElementById('forgot-link-wrap');
+    if (fl) fl.style.display = 'none';
+    document.getElementById('forgot-panel').style.display = 'block';
+    // Reset all 3 steps
+    document.getElementById('fp-step1').style.display = 'block';
+    document.getElementById('fp-step2').style.display = 'none';
+    document.getElementById('fp-step3').style.display = 'none';
+    const emailEl = document.getElementById('fp-email');
+    if (emailEl) { emailEl.value = ''; setTimeout(() => emailEl.focus(), 100); }
+    fpEmail = '';
+    if (window.lucide) window.lucide.createIcons();
+}
+
+function hideForgotPanel() {
+    document.getElementById('forgot-panel').style.display = 'none';
+    document.getElementById('auth-form').style.display = 'block';
+    const fl = document.getElementById('forgot-link-wrap');
+    if (fl) fl.style.display = 'block';
+    fpEmail = '';
+}
+
+async function requestOtp() {
+    const email = document.getElementById('fp-email').value.trim();
+    if (!email) { showToast('Error', 'Please enter your registered email address', 'error'); return; }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showToast('Error', 'Please enter a valid email address', 'error'); return; }
+
+    const btn = document.getElementById('fp-send-btn');
+    if (btn) { btn.disabled = true; btn.querySelector('span').textContent = 'Sending OTP…'; }
+
+    try {
+        const res = await fetch('/api/auth/request-otp', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Request failed');
+
+        fpEmail = email;
+        const notice = document.getElementById('fp-email-notice');
+        if (notice) notice.textContent = `OTP sent to: ${data.masked_email || email}`;
+
+        document.getElementById('fp-step1').style.display = 'none';
+        document.getElementById('fp-step2').style.display = 'block';
+        const otpEl = document.getElementById('fp-otp');
+        if (otpEl) { otpEl.value = ''; setTimeout(() => otpEl.focus(), 100); }
+        showToast('OTP Sent! 📧', `Check your inbox`, 'success');
+        if (window.lucide) window.lucide.createIcons();
+    } catch (e) {
+        showToast('Error', e.message, 'error');
+    } finally {
+        if (btn) { btn.disabled = false; btn.querySelector('span').textContent = 'Send OTP to Email'; }
+    }
+}
+
+function verifyOtp() {
+    const otp = document.getElementById('fp-otp').value.trim();
+    if (!otp || otp.length !== 6) { showToast('Error', 'Enter the 6-digit OTP from your email', 'error'); return; }
+    // Move to step 3 — OTP is verified on server during resetPassword
+    document.getElementById('fp-step2').style.display = 'none';
+    document.getElementById('fp-step3').style.display = 'block';
+    setTimeout(() => document.getElementById('fp-new-pwd')?.focus(), 100);
+    if (window.lucide) window.lucide.createIcons();
+}
+
+async function resetPassword() {
+    const otp = document.getElementById('fp-otp').value.trim();
+    const newPwd = document.getElementById('fp-new-pwd').value;
+    const confPwd = document.getElementById('fp-confirm-pwd').value;
+
+    if (!newPwd || newPwd.length < 6) { showToast('Error', 'Password must be at least 6 characters', 'error'); return; }
+    if (newPwd !== confPwd) { showToast('Error', 'Passwords do not match', 'error'); return; }
+
+    try {
+        const res = await fetch('/api/auth/reset-password', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: fpEmail, otp, new_password: newPwd })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Reset failed');
+
+        showToast('✅ Password Reset!', 'You can now login with your new password', 'success');
+        hideForgotPanel();
+        document.getElementById('auth-form').reset();
+    } catch (e) {
+        showToast('Error', e.message, 'error');
+        // OTP invalid/expired — go back to OTP entry
+        document.getElementById('fp-step3').style.display = 'none';
+        document.getElementById('fp-step2').style.display = 'block';
+        if (window.lucide) window.lucide.createIcons();
+    }
+}
+
+
+
+
+// Load my own staff profile into sidebar card (Officer / Guard only)
+async function loadMyProfile() {
+    const session = localStorage.getItem('jms_user');
+    if (!session) return;
+    const user = JSON.parse(session);
+    const card = document.getElementById('my-profile-card');
+    if (!card) return;
+
+    // Only show for Officer and Guard
+    if (!['Officer', 'Guard'].includes(user.role)) {
+        card.style.display = 'none';
+        return;
+    }
+
+    try {
+        const res = await fetch('/api/staff/me', { headers: getAuthHeaders() });
+        if (!res.ok) return; // silently skip if not found
+        const s = await res.json();
+        document.getElementById('my-staff-id').textContent = s.staff_id || '-';
+        document.getElementById('my-staff-role').textContent = s.role || '-';
+        document.getElementById('my-staff-shift').textContent = s.shift || '-';
+        document.getElementById('my-staff-hours').textContent =
+            (s.shift_start && s.shift_end) ? `${s.shift_start} – ${s.shift_end}` : '-';
+        document.getElementById('my-staff-phone').textContent = s.phone || '-';
+        card.style.display = 'block';
+        if (window.lucide) window.lucide.createIcons();
+    } catch (e) {
+        // silently ignore
+    }
+}
+
+
+// Mobile Sidebar Toggle
+function toggleMobileSidebar(force) {
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebar-overlay');
+    if (!sidebar) return;
+    const isOpen = sidebar.classList.contains('open');
+    const shouldOpen = (typeof force === 'boolean') ? force : !isOpen;
+    if (shouldOpen) {
+        sidebar.classList.add('open');
+        if (overlay) overlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    } else {
+        sidebar.classList.remove('open');
+        if (overlay) overlay.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+}
+
+// Switch Views
+function switchView(viewName) {
+    toggleMobileSidebar(false);
+    const sections = document.querySelectorAll('.view-section');
+    sections.forEach(sec => sec.style.display = 'none');
+    const target = document.getElementById(`view-${viewName}`);
+    if (target) {
+        target.style.display = 'block';
+        // Dynamic GSAP Animation
+        if (window.gsap) {
+            gsap.fromTo(target, { opacity: 0, y: 15 }, { opacity: 1, y: 0, duration: 0.4, ease: "power3.out" });
+        }
+    }
+
+    const navBtns = document.querySelectorAll('.nav-btn');
+    navBtns.forEach(btn => btn.classList.remove('active'));
+    const activeBtn = document.getElementById(`nav-${viewName}`);
+    if (activeBtn) activeBtn.classList.add('active');
+
+    const viewTitle = document.getElementById('view-title');
+    const viewDesc = document.getElementById('view-description');
+
+    const titles = {
+        dashboard: { title: 'Dashboard Overview', desc: 'Summary metrics and charts' },
+        prisoners: { title: 'Prisoner Management', desc: 'Manage inmate profiles, sentences, and emergencies' },
+        staff: { title: 'Staff Directory', desc: 'Track officers, shift rosters, and credentials' },
+        visitors: { title: 'Visitor Logbook', desc: 'Track visitor schedules' },
+        cells: { title: 'Cell Matrix', desc: 'Monitor jail cells capacity and occupancy' },
+        incidents: { title: 'Incident Register', desc: 'Log and track disciplinary/security incidents' },
+        reports: { title: 'Stats & Export Console', desc: 'Generate system statistics and export spreadsheets' },
+        logs: { title: 'Security Audit Logs', desc: 'Inspect database reads and writes' }
+    };
+
+    if (viewTitle && titles[viewName]) viewTitle.textContent = titles[viewName].title;
+    if (viewDesc && titles[viewName]) viewDesc.textContent = titles[viewName].desc;
+
+    currentView = viewName;
+
+    // Refresh respective view data
+    if (viewName === 'dashboard') {
+        loadDashboardData();
+        if (window.gsap) gsap.fromTo(".stat-card", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.5, stagger: 0.1, ease: "back.out(1.7)" });
+    }
+    else if (viewName === 'prisoners') { loadPrisoners(); clearPrisonerForm(); }
+    else if (viewName === 'staff') {
+        loadStaff();
+        clearStaffForm();
+        const session = localStorage.getItem('jms_user');
+        const userRole = session ? JSON.parse(session).role : '';
+        const staffFormCard = document.querySelector('#view-staff .form-card');
+        const staffGrid = document.querySelector('#view-staff .management-grid');
+        const isAdmin = (userRole === 'Admin');
+        if (staffFormCard) staffFormCard.style.display = isAdmin ? 'block' : 'none';
+        // Full-width table when form is hidden for non-Admin
+        if (staffGrid) staffGrid.style.gridTemplateColumns = isAdmin ? '' : '1fr';
+    }
+    else if (viewName === 'visitors') { loadVisitors(); clearVisitorForm(); }
+    else if (viewName === 'cells') { loadCells(); clearCellForm(); }
+    else if (viewName === 'incidents') { loadIncidents(); clearIncidentForm(); }
+    else if (viewName === 'reports') { loadReportStats(); }
+    else if (viewName === 'logs') { loadAuditLogs(); }
+    else if (viewName === 'approvals') { loadPendingUsers(); }
+
+    if (window.lucide) window.lucide.createIcons();
+}
+
+// =========================================================
+// DASHBOARD LOGIC
+// =========================================================
+async function loadDashboardData() {
+    try {
+        const statsRes = await fetch('/api/dashboard/stats', { headers: getAuthHeaders() });
+        if (!statsRes.ok) throw new Error('Stats retrieval failed');
+        const stats = await statsRes.json();
+
+        document.getElementById('stat-count-prisoners').textContent = stats.prisoners;
+        document.getElementById('stat-count-staff').textContent = stats.staff;
+        document.getElementById('stat-count-visitors').textContent = stats.visitors;
+        document.getElementById('stat-active-prisoners').textContent = `Active: ${stats.active_prisoners} | Released: ${stats.released_prisoners}`;
+        document.getElementById('stat-cells-occupancy').textContent = `Cells Occupied: ${stats.cells}`;
+
+        renderDashboardChart(stats);
+        loadUpcomingReleases();
+    } catch (error) {
+        showToast('Dashboard Error', error.message, 'error');
+    }
+}
+
+async function loadUpcomingReleases() {
+    const container = document.getElementById('releases-list');
+    if (!container) return;
+    try {
+        const res = await fetch('/api/dashboard/releases', { headers: getAuthHeaders() });
+        if (!res.ok) throw new Error('Releases load failed');
+        const list = await res.json();
+
+        if (list.length === 0) {
+            container.innerHTML = `<p class="text-secondary" style="font-size: 13px; text-align: center; margin-top:20px;">No releases scheduled in the next 30 days.</p>`;
+            return;
+        }
+
+        container.innerHTML = list.map(item => `
+      <div class="release-item">
+        <div class="release-item-left">
+          <span class="release-p-id">${item.prisoner_id}</span>
+          <span class="release-p-name">${item.name}</span>
+        </div>
+        <div class="release-item-right">
+          <span class="release-days">${item.days} days left</span>
+          <span class="release-date">${item.release_date}</span>
+        </div>
+      </div>
+    `).join('');
+    } catch (error) {
+        container.innerHTML = `<p class="text-danger" style="font-size:12px; text-align:center;">Failed to load upcoming releases: ${error.message}</p>`;
+    }
+}
+
+function renderDashboardChart(stats) {
+    const canvas = document.getElementById('overview-chart');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (overviewChart) overviewChart.destroy();
+
+    overviewChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['Prisoners', 'Staff', 'Visitors', 'Total Cells', 'Incidents'],
+            datasets: [{
+                data: [stats.prisoners, stats.staff, stats.visitors, stats.total_cells || 0, stats.incidents || 0],
+                backgroundColor: [
+                    'rgba(99, 102, 241, 0.45)', // Indigo
+                    'rgba(16, 185, 129, 0.45)', // Emerald
+                    'rgba(245, 158, 11, 0.45)',  // Amber
+                    'rgba(124, 58, 237, 0.45)',  // Purple
+                    'rgba(239, 68, 68, 0.45)'    // Red
+                ],
+                borderColor: ['#6366f1', '#10b981', '#f59e0b', '#7c3aed', '#ef4444'],
+                borderWidth: 1.5,
+                borderRadius: 6
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                y: { beginAtZero: true, grid: { color: 'rgba(36, 50, 79, 0.15)' } },
+                x: { grid: { display: false } }
+            }
+        }
+    });
+}
+
+// =========================================================
+// PRISONERS MANAGEMENT
+// =========================================================
+async function loadPrisoners() {
+    const query = document.getElementById('p-search').value;
+    const statusFilter = document.getElementById('p-status-filter').value;
+    try {
+        const res = await fetch(`/api/prisoners?q=${encodeURIComponent(query)}&status=${encodeURIComponent(statusFilter)}`, { headers: getAuthHeaders() });
+        if (!res.ok) throw new Error('Inmates load failed');
+        const list = await res.json();
+        const tbody = document.getElementById('prisoners-table-body');
+        tbody.innerHTML = '';
+
+        list.forEach(p => {
+            const tr = document.createElement('tr');
+            tr.className = selectedPrisonerId === p.prisoner_id ? 'selected-row' : '';
+            tr.onclick = () => selectPrisoner(p);
+            const tagClass = p.status === 'Active' ? 'badge badge-danger' : 'badge badge-success';
+            const photoHtml = p.photo
+                ? `<img src="${p.photo}" alt="Mugshot" style="width:38px;height:38px;border-radius:6px;object-fit:cover;border:1px solid var(--border-color);">`
+                : `<div style="width:38px;height:38px;border-radius:6px;background:rgba(99,102,241,0.15);display:inline-flex;align-items:center;justify-content:center;color:var(--text-muted);font-size:18px;">👤</div>`;
+            tr.innerHTML = `
+        <td>${photoHtml}</td>
+        <td><strong>${p.prisoner_id}</strong></td>
+        <td>${p.name}</td>
+        <td>${p.age}</td>
+        <td>${p.gender}</td>
+        <td><span class="cell-tag">${p.cell || '-'}</span></td>
+        <td>${p.crime}</td>
+        <td>${p.entry_date}</td>
+        <td>${p.release_date}</td>
+        <td><span class="${tagClass}">${p.status}</span></td>
+      `;
+            tbody.appendChild(tr);
+        });
+    } catch (error) {
+        showToast('Error', error.message, 'error');
+    }
+}
+
+function selectPrisoner(p) {
+    selectedPrisonerId = p.prisoner_id;
+    const rows = document.querySelectorAll('#prisoners-table-body tr');
+    rows.forEach(r => r.classList.remove('selected-row'));
+    const match = Array.from(rows).find(r => r.cells[1].textContent.trim() === p.prisoner_id);
+    if (match) match.classList.add('selected-row');
+
+    document.getElementById('p-selected-id').value = p.prisoner_id;
+    document.getElementById('p-name').value = p.name;
+    document.getElementById('p-age').value = p.age;
+    document.getElementById('p-gender').value = p.gender;
+    document.getElementById('p-cell').value = p.cell;
+    document.getElementById('p-block').value = p.block || '';
+    document.getElementById('p-crime').value = p.crime;
+    document.getElementById('p-entry').value = p.entry_date;
+    document.getElementById('p-days').value = p.sentence_days || '';
+    document.getElementById('p-emergency').value = p.emergency_contact || '';
+    document.getElementById('p-phone').value = p.contact_phone || '';
+
+    // Show existing photo in preview
+    const preview = document.getElementById('p-photo-preview');
+    const nameEl = document.getElementById('p-photo-name');
+    if (p.photo) {
+        preview.src = p.photo;
+        preview.style.display = 'inline-block';
+        if (nameEl) nameEl.textContent = 'Current mugshot';
+    } else {
+        preview.src = '';
+        preview.style.display = 'none';
+        if (nameEl) nameEl.textContent = 'No photo on file';
+    }
+
+    toggleModifyButtons('p', false);
+    document.getElementById('prisoner-form-title').textContent = `Edit Prisoner: ${p.prisoner_id}`;
+}
+
+function clearPrisonerForm() {
+    selectedPrisonerId = null;
+    document.getElementById('prisoner-form').reset();
+    document.getElementById('p-selected-id').value = '';
+    toggleModifyButtons('p', true);
+    document.getElementById('prisoner-form-title').textContent = 'Add Prisoner Record';
+    const rows = document.querySelectorAll('#prisoners-table-body tr');
+    rows.forEach(r => r.classList.remove('selected-row'));
+    // Reset photo preview
+    const preview = document.getElementById('p-photo-preview');
+    const nameEl = document.getElementById('p-photo-name');
+    if (preview) { preview.src = ''; preview.style.display = 'none'; }
+    if (nameEl) nameEl.textContent = 'No file chosen';
+}
+
+// Preview mugshot when file is selected
+function previewMugshot(input) {
+    const preview = document.getElementById('p-photo-preview');
+    const nameEl = document.getElementById('p-photo-name');
+    const file = input.files[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+        showToast('Invalid File', 'Please select a JPG or PNG image', 'error');
+        input.value = '';
+        return;
+    }
+    if (file.size > 2 * 1024 * 1024) {
+        showToast('File Too Large', 'Photo must be under 2MB', 'error');
+        input.value = '';
+        return;
+    }
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        preview.src = e.target.result;
+        preview.style.display = 'inline-block';
+        if (nameEl) nameEl.textContent = file.name;
+    };
+    reader.readAsDataURL(file);
+}
+
+function toggleModifyButtons(prefix, isAddMode) {
+    const add = document.getElementById(`${prefix}-btn-add`);
+    const update = document.getElementById(`${prefix}-btn-update`);
+    const del = document.getElementById(`${prefix}-btn-delete`);
+    const pdf = document.getElementById(`${prefix}-btn-pdf`);
+
+    if (add) {
+        add.disabled = !isAddMode;
+        toggleBtnClass(add, !isAddMode);
+    }
+    if (update) {
+        update.disabled = isAddMode;
+        toggleBtnClass(update, isAddMode);
+    }
+    if (del) {
+        del.disabled = isAddMode;
+        toggleBtnClass(del, isAddMode);
+    }
+    if (pdf) {
+        pdf.disabled = isAddMode;
+        toggleBtnClass(pdf, isAddMode);
+    }
+}
+
+function toggleBtnClass(btn, disable) {
+    if (disable) btn.classList.add('btn-disabled');
+    else btn.classList.remove('btn-disabled');
+}
+
+async function handlePrisonerSubmit(event) {
+    event.preventDefault();
+    const name = document.getElementById('p-name').value.trim();
+    const age = document.getElementById('p-age').value;
+    const gender = document.getElementById('p-gender').value;
+    const cell = document.getElementById('p-cell').value.trim();
+    const block = document.getElementById('p-block').value.trim();
+    const crime = document.getElementById('p-crime').value.trim();
+    const entry_date = document.getElementById('p-entry').value;
+    const sentence_days = document.getElementById('p-days').value;
+    const emergency_contact = document.getElementById('p-emergency').value.trim();
+    const contact_phone = document.getElementById('p-phone').value.trim();
+    const photo = document.getElementById('p-photo-preview').src || '';
+    const photoData = (photo && photo.startsWith('data:image')) ? photo : '';
+
+    try {
+        const res = await fetch('/api/prisoners', {
+            method: 'POST',
+            headers: getAuthHeaders(),
+            body: JSON.stringify({ name, age, gender, cell, block, crime, entry_date, sentence_days, emergency_contact, contact_phone, photo: photoData })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Failed to save prisoner');
+        showToast('Success', data.message, 'success');
+        clearPrisonerForm();
+        loadPrisoners();
+    } catch (error) {
+        showToast('Error', error.message, 'error');
+    }
+}
+
+async function updatePrisoner() {
+    if (!selectedPrisonerId) return;
+    const name = document.getElementById('p-name').value.trim();
+    const age = document.getElementById('p-age').value;
+    const gender = document.getElementById('p-gender').value;
+    const cell = document.getElementById('p-cell').value.trim();
+    const block = document.getElementById('p-block').value.trim();
+    const crime = document.getElementById('p-crime').value.trim();
+    const entry_date = document.getElementById('p-entry').value;
+    const sentence_days = document.getElementById('p-days').value;
+    const emergency_contact = document.getElementById('p-emergency').value.trim();
+    const contact_phone = document.getElementById('p-phone').value.trim();
+    const photo = document.getElementById('p-photo-preview').src || '';
+    const photoData = (photo && photo.startsWith('data:image')) ? photo : (photo && photo.length > 200 ? photo : '');
+
+    try {
+        const res = await fetch(`/api/prisoners/${selectedPrisonerId}`, {
+            method: 'PUT',
+            headers: getAuthHeaders(),
+            body: JSON.stringify({ name, age, gender, cell, block, crime, entry_date, sentence_days, emergency_contact, contact_phone, photo: photoData })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Failed to update prisoner');
+        showToast('Success', data.message, 'success');
+        clearPrisonerForm();
+        loadPrisoners();
+    } catch (error) {
+        showToast('Error', error.message, 'error');
+    }
+}
+
+async function deletePrisoner() {
+    if (!selectedPrisonerId) return;
+    if (!confirm('Are you sure you want to delete this prisoner record?')) return;
+    try {
+        const res = await fetch(`/api/prisoners/${selectedPrisonerId}`, { method: 'DELETE', headers: getAuthHeaders() });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Failed to delete');
+        showToast('Deleted', data.message, 'success');
+        clearPrisonerForm();
+        loadPrisoners();
+    } catch (error) {
+        showToast('Error', error.message, 'error');
+    }
+}
+
+// =========================================================
+// STAFF MANAGEMENT
+// =========================================================
+async function loadStaff() {
+    const query = document.getElementById('s-search').value;
+    const roleFilter = document.getElementById('s-role-filter').value;
+    try {
+        const res = await fetch(`/api/staff?q=${encodeURIComponent(query)}&role=${encodeURIComponent(roleFilter)}`, { headers: getAuthHeaders() });
+        if (!res.ok) throw new Error('Staff roster load failed');
+        const list = await res.json();
+        const tbody = document.getElementById('staff-table-body');
+        tbody.innerHTML = '';
+
+        list.forEach(s => {
+            const tr = document.createElement('tr');
+            tr.className = selectedStaffId === s._id ? 'selected-row' : '';
+            tr.onclick = () => selectStaff(s);
+
+            tr.innerHTML = `
+        <td><strong>${s.staff_id || '-'}</strong></td>
+        <td>${s.name}</td>
+        <td>${s.role}</td>
+        <td>${s.phone}</td>
+        <td><span class="cell-tag">${s.shift}</span></td>
+        <td>${s.shift_start}</td>
+        <td>${s.shift_end}</td>
+      `;
+            tbody.appendChild(tr);
+        });
+    } catch (error) {
+        showToast('Error', error.message, 'error');
+    }
+}
+
+function selectStaff(s) {
+    selectedStaffId = s._id;
+    const rows = document.querySelectorAll('#staff-table-body tr');
+    rows.forEach(r => r.classList.remove('selected-row'));
+    const match = Array.from(rows).find(r => r.cells[0].textContent.trim() === (s.staff_id || ''));
+    if (match) match.classList.add('selected-row');
+
+    document.getElementById('s-selected-id').value = s._id;
+    document.getElementById('s-name').value = s.name;
+    document.getElementById('s-role').value = s.role;
+    document.getElementById('s-phone').value = s.phone;
+    document.getElementById('s-shift').value = s.shift;
+    document.getElementById('s-start').value = s.shift_start;
+    document.getElementById('s-end').value = s.shift_end;
+
+    toggleModifyButtons('s', false);
+    document.getElementById('staff-form-title').textContent = `Edit Staff: ${s.staff_id || s.name}`;
+}
+
+function clearStaffForm() {
+    selectedStaffId = null;
+    document.getElementById('staff-form').reset();
+    document.getElementById('s-selected-id').value = '';
+    toggleModifyButtons('s', true);
+    document.getElementById('staff-form-title').textContent = 'Add Staff Member';
+    const rows = document.querySelectorAll('#staff-table-body tr');
+    rows.forEach(r => r.classList.remove('selected-row'));
+}
+
+async function handleStaffSubmit(event) {
+    event.preventDefault();
+    const name = document.getElementById('s-name').value.trim();
+    const role = document.getElementById('s-role').value;
+    const phone = document.getElementById('s-phone').value.trim();
+    const shift = document.getElementById('s-shift').value;
+    const shift_start = document.getElementById('s-start').value.trim();
+    const shift_end = document.getElementById('s-end').value.trim();
+
+    try {
+        const res = await fetch('/api/staff', {
+            method: 'POST',
+            headers: getAuthHeaders(),
+            body: JSON.stringify({ name, role, phone, shift, shift_start, shift_end })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Failed to save staff');
+        showToast('Success', data.message, 'success');
+        clearStaffForm();
+        loadStaff();
+    } catch (error) {
+        showToast('Error', error.message, 'error');
+    }
+}
+
+async function updateStaff() {
+    if (!selectedStaffId) return;
+    const name = document.getElementById('s-name').value.trim();
+    const role = document.getElementById('s-role').value;
+    const phone = document.getElementById('s-phone').value.trim();
+    const shift = document.getElementById('s-shift').value;
+    const shift_start = document.getElementById('s-start').value.trim();
+    const shift_end = document.getElementById('s-end').value.trim();
+
+    try {
+        const res = await fetch(`/api/staff/${selectedStaffId}`, {
+            method: 'PUT',
+            headers: getAuthHeaders(),
+            body: JSON.stringify({ name, role, phone, shift, shift_start, shift_end })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Failed to update staff');
+        showToast('Success', data.message, 'success');
+        clearStaffForm();
+        loadStaff();
+    } catch (error) {
+        showToast('Error', error.message, 'error');
+    }
+}
+
+async function deleteStaff() {
+    if (!selectedStaffId) return;
+    if (!confirm('Are you sure you want to delete this staff member?')) return;
+    try {
+        const res = await fetch(`/api/staff/${selectedStaffId}`, { method: 'DELETE', headers: getAuthHeaders() });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Failed to delete');
+        showToast('Deleted', data.message, 'success');
+        clearStaffForm();
+        loadStaff();
+    } catch (error) {
+        showToast('Error', error.message, 'error');
+    }
+}
+
+// =========================================================
+// VISITORS MANAGEMENT
+// =========================================================
+async function loadVisitors() {
+    const query = document.getElementById('v-search').value;
+    try {
+        const res = await fetch(`/api/visitors?q=${encodeURIComponent(query)}`, { headers: getAuthHeaders() });
+        if (!res.ok) throw new Error('Visitors load failed');
+        const list = await res.json();
+        const tbody = document.getElementById('visitors-table-body');
+        tbody.innerHTML = '';
+
+        list.forEach(v => {
+            const tr = document.createElement('tr');
+            tr.className = selectedVisitorId === v._id ? 'selected-row' : '';
+            tr.onclick = () => selectVisitor(v);
+            const prDetails = v.prisoner_name ? `${v.prisoner_name} (${v.prisoner})` : v.prisoner;
+            tr.innerHTML = `
+        <td><strong>${v.visit_id || '-'}</strong></td>
+        <td>${v.visitor}</td>
+        <td>${prDetails}</td>
+        <td>${v.relation}</td>
+        <td>${v.phone || '-'}</td>
+        <td>${v.visit_date}</td>
+        <td>${v.visit_time}</td>
+      `;
+            tbody.appendChild(tr);
+        });
+    } catch (error) {
+        showToast('Error', error.message, 'error');
+    }
+}
+
+function selectVisitor(v) {
+    selectedVisitorId = v._id;
+    const rows = document.querySelectorAll('#visitors-table-body tr');
+    rows.forEach(r => r.classList.remove('selected-row'));
+    const match = Array.from(rows).find(r => r.cells[0].textContent.trim() === (v.visit_id || ''));
+    if (match) match.classList.add('selected-row');
+
+    document.getElementById('v-selected-id').value = v._id;
+    document.getElementById('v-name').value = v.visitor;
+    document.getElementById('v-prisoner').value = v.prisoner;
+    document.getElementById('v-relation').value = v.relation;
+    document.getElementById('v-phone').value = v.phone || '';
+    document.getElementById('v-date').value = v.visit_date;
+    document.getElementById('v-time').value = v.visit_time;
+
+    toggleModifyButtons('v', false);
+    document.getElementById('visitor-form-title').textContent = `Edit Visit: ${v.visit_id || v.visitor}`;
+}
+
+function clearVisitorForm() {
+    selectedVisitorId = null;
+    document.getElementById('visitor-form').reset();
+    document.getElementById('v-selected-id').value = '';
+    document.getElementById('v-date').value = new Date().toISOString().split('T')[0];
+    document.getElementById('v-time').value = new Date().toTimeString().slice(0, 5);
+    toggleModifyButtons('v', true);
+    document.getElementById('visitor-form-title').textContent = 'Log Visitor Record';
+    const rows = document.querySelectorAll('#visitors-table-body tr');
+    rows.forEach(r => r.classList.remove('selected-row'));
+}
+
+async function handleVisitorSubmit(event) {
+    event.preventDefault();
+    const visitor = document.getElementById('v-name').value.trim();
+    const prisoner = document.getElementById('v-prisoner').value.trim();
+    const relation = document.getElementById('v-relation').value.trim();
+    const phone = document.getElementById('v-phone').value.trim();
+    const visit_date = document.getElementById('v-date').value;
+    const visit_time = document.getElementById('v-time').value.trim();
+
+    try {
+        const res = await fetch('/api/visitors', {
+            method: 'POST',
+            headers: getAuthHeaders(),
+            body: JSON.stringify({ visitor, prisoner, relation, phone, visit_date, visit_time })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Failed to save visitor log');
+        showToast('Success', data.message, 'success');
+        clearVisitorForm();
+        loadVisitors();
+    } catch (error) {
+        showToast('Error', error.message, 'error');
+    }
+}
+
+async function updateVisitor() {
+    if (!selectedVisitorId) return;
+    const visitor = document.getElementById('v-name').value.trim();
+    const prisoner = document.getElementById('v-prisoner').value.trim();
+    const relation = document.getElementById('v-relation').value.trim();
+    const phone = document.getElementById('v-phone').value.trim();
+    const visit_date = document.getElementById('v-date').value;
+    const visit_time = document.getElementById('v-time').value.trim();
+
+    try {
+        const res = await fetch(`/api/visitors/${selectedVisitorId}`, {
+            method: 'PUT',
+            headers: getAuthHeaders(),
+            body: JSON.stringify({ visitor, prisoner, relation, phone, visit_date, visit_time })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Failed to update visitor record');
+        showToast('Success', data.message, 'success');
+        clearVisitorForm();
+        loadVisitors();
+    } catch (error) {
+        showToast('Error', error.message, 'error');
+    }
+}
+
+async function deleteVisitor() {
+    if (!selectedVisitorId) return;
+    if (!confirm('Are you sure you want to delete this visitor log?')) return;
+    try {
+        const res = await fetch(`/api/visitors/${selectedVisitorId}`, { method: 'DELETE', headers: getAuthHeaders() });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Failed to delete');
+        showToast('Deleted', data.message, 'success');
+        clearVisitorForm();
+        loadVisitors();
+    } catch (error) {
+        showToast('Error', error.message, 'error');
+    }
+}
+
+// =========================================================
+// CELLS MANAGEMENT
+// =========================================================
+async function loadCells() {
+    const query = document.getElementById('cell-search').value.trim().toLowerCase();
+    try {
+        const res = await fetch('/api/cells', { headers: getAuthHeaders() });
+        if (!res.ok) throw new Error('Cells query failed');
+        const list = await res.json();
+        const tbody = document.getElementById('cells-table-body');
+        tbody.innerHTML = '';
+
+        list.forEach(c => {
+            if (query && !c.cell_id.toLowerCase().includes(query) && !c.block.toLowerCase().includes(query)) return;
+            const tr = document.createElement('tr');
+            tr.className = selectedCellId === c._id ? 'selected-row' : '';
+            tr.onclick = () => selectCell(c);
+
+            const tagClass = c.status === 'FULL' ? 'badge badge-danger' : 'badge badge-success';
+            tr.innerHTML = `
+        <td><strong>${c.cell_id}</strong></td>
+        <td>${c.block}</td>
+        <td>${c.floor}</td>
+        <td>${c.capacity}</td>
+        <td>${c.occupied}</td>
+        <td>${c.available}</td>
+        <td><span class="${tagClass}">${c.status}</span></td>
+      `;
+            tbody.appendChild(tr);
+        });
+    } catch (error) {
+        showToast('Error', error.message, 'error');
+    }
+}
+
+function selectCell(c) {
+    selectedCellId = c._id;
+    const rows = document.querySelectorAll('#cells-table-body tr');
+    rows.forEach(r => r.classList.remove('selected-row'));
+    const match = Array.from(rows).find(r => r.cells[0].textContent.trim() === c.cell_id);
+    if (match) match.classList.add('selected-row');
+
+    document.getElementById('cell-selected-id').value = c._id;
+    document.getElementById('cell-id-input').value = c.cell_id;
+    document.getElementById('cell-block-input').value = c.block;
+    document.getElementById('cell-floor-input').value = c.floor;
+    document.getElementById('cell-capacity-input').value = c.capacity;
+
+    document.getElementById('cell-id-input').disabled = true;
+    toggleModifyButtons('cell', false);
+    document.getElementById('cell-form-title').textContent = `Edit Cell: ${c.cell_id}`;
+}
+
+function clearCellForm() {
+    selectedCellId = null;
+    document.getElementById('cell-form').reset();
+    document.getElementById('cell-selected-id').value = '';
+    document.getElementById('cell-id-input').disabled = false;
+    toggleModifyButtons('cell', true);
+    document.getElementById('cell-form-title').textContent = 'Add Cell Record';
+    const rows = document.querySelectorAll('#cells-table-body tr');
+    rows.forEach(r => r.classList.remove('selected-row'));
+}
+
+async function handleCellSubmit(event) {
+    event.preventDefault();
+    const cell_id = document.getElementById('cell-id-input').value.trim();
+    const block = document.getElementById('cell-block-input').value.trim();
+    const floor = document.getElementById('cell-floor-input').value.trim();
+    const capacity = document.getElementById('cell-capacity-input').value;
+
+    try {
+        const res = await fetch('/api/cells', {
+            method: 'POST',
+            headers: getAuthHeaders(),
+            body: JSON.stringify({ cell_id, block, floor, capacity })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Failed to save cell data');
+        showToast('Success', data.message, 'success');
+        clearCellForm();
+        loadCells();
+    } catch (error) {
+        showToast('Error', error.message, 'error');
+    }
+}
+
+async function updateCell() {
+    if (!selectedCellId) return;
+    const block = document.getElementById('cell-block-input').value.trim();
+    const floor = document.getElementById('cell-floor-input').value.trim();
+    const capacity = document.getElementById('cell-capacity-input').value;
+
+    try {
+        const res = await fetch(`/api/cells/${selectedCellId}`, {
+            method: 'PUT',
+            headers: getAuthHeaders(),
+            body: JSON.stringify({ block, floor, capacity })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Failed to update cell');
+        showToast('Success', data.message, 'success');
+        clearCellForm();
+        loadCells();
+    } catch (error) {
+        showToast('Error', error.message, 'error');
+    }
+}
+
+async function deleteCell() {
+    if (!selectedCellId) return;
+    if (!confirm('Are you sure you want to delete this cell?')) return;
+    try {
+        const res = await fetch(`/api/cells/${selectedCellId}`, { method: 'DELETE', headers: getAuthHeaders() });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Failed to delete cell');
+        showToast('Deleted', data.message, 'success');
+        clearCellForm();
+        loadCells();
+    } catch (error) {
+        showToast('Error', error.message, 'error');
+    }
+}
+
+// =========================================================
+// INCIDENTS MANAGEMENT
+// =========================================================
+async function loadIncidents() {
+    const query = document.getElementById('i-search').value.trim().toLowerCase();
+    try {
+        const res = await fetch('/api/incidents', { headers: getAuthHeaders() });
+        if (!res.ok) throw new Error('Incidents fetch failed');
+        const list = await res.json();
+        const tbody = document.getElementById('incidents-table-body');
+        tbody.innerHTML = '';
+
+        list.forEach(i => {
+            const matchText = (i.location + i.type + i.prisoner + i.description).toLowerCase();
+            if (query && !matchText.includes(query)) return;
+            const tr = document.createElement('tr');
+            tr.className = selectedIncidentId === i._id ? 'selected-row' : '';
+            tr.onclick = () => selectIncident(i);
+
+            tr.innerHTML = `
+        <td><strong>${i.incident_id || '-'}</strong></td>
+        <td>${i.date}</td>
+        <td>${i.type}</td>
+        <td>${i.location}</td>
+        <td>${i.prisoner || '-'}</td>
+        <td><span class="cell-tag">${i.status}</span></td>
+        <td>${i.reported_by || '-'}</td>
+      `;
+            tbody.appendChild(tr);
+        });
+    } catch (error) {
+        showToast('Error', error.message, 'error');
+    }
+}
+
+function selectIncident(i) {
+    selectedIncidentId = i._id;
+    const rows = document.querySelectorAll('#incidents-table-body tr');
+    rows.forEach(r => r.classList.remove('selected-row'));
+    const match = Array.from(rows).find(r => r.cells[0].textContent.trim() === (i.incident_id || ''));
+    if (match) match.classList.add('selected-row');
+
+    document.getElementById('i-selected-id').value = i._id;
+    document.getElementById('i-date').value = i.date;
+    document.getElementById('i-type').value = i.type;
+    document.getElementById('i-location').value = i.location;
+    document.getElementById('i-prisoner').value = i.prisoner || '';
+    document.getElementById('i-status').value = i.status;
+    document.getElementById('i-description').value = i.description || '';
+
+    toggleModifyButtons('i', false);
+    document.getElementById('incident-form-title').textContent = `Edit Incident: ${i.incident_id}`;
+}
+
+function clearIncidentForm() {
+    selectedIncidentId = null;
+    document.getElementById('incident-form').reset();
+    document.getElementById('i-selected-id').value = '';
+    document.getElementById('i-date').value = new Date().toISOString().split('T')[0];
+    toggleModifyButtons('i', true);
+    document.getElementById('incident-form-title').textContent = 'Report Security Incident';
+    const rows = document.querySelectorAll('#incidents-table-body tr');
+    rows.forEach(r => r.classList.remove('selected-row'));
+}
+
+async function handleIncidentSubmit(event) {
+    event.preventDefault();
+    const date = document.getElementById('i-date').value;
+    const type = document.getElementById('i-type').value;
+    const location = document.getElementById('i-location').value.trim();
+    const prisoner = document.getElementById('i-prisoner').value.trim();
+    const status = document.getElementById('i-status').value;
+    const description = document.getElementById('i-description').value.trim();
+
+    try {
+        const res = await fetch('/api/incidents', {
+            method: 'POST',
+            headers: getAuthHeaders(),
+            body: JSON.stringify({ date, type, location, prisoner, status, description })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Failed to save incident report');
+        showToast('Success', data.message, 'success');
+        clearIncidentForm();
+        loadIncidents();
+    } catch (error) {
+        showToast('Error', error.message, 'error');
+    }
+}
+
+async function updateIncident() {
+    if (!selectedIncidentId) return;
+    const date = document.getElementById('i-date').value;
+    const type = document.getElementById('i-type').value;
+    const location = document.getElementById('i-location').value.trim();
+    const prisoner = document.getElementById('i-prisoner').value.trim();
+    const status = document.getElementById('i-status').value;
+    const description = document.getElementById('i-description').value.trim();
+
+    try {
+        const res = await fetch(`/api/incidents/${selectedIncidentId}`, {
+            method: 'PUT',
+            headers: getAuthHeaders(),
+            body: JSON.stringify({ date, type, location, prisoner, status, description })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Failed to update incident report');
+        showToast('Success', data.message, 'success');
+        clearIncidentForm();
+        loadIncidents();
+    } catch (error) {
+        showToast('Error', error.message, 'error');
+    }
+}
+
+async function deleteIncident() {
+    if (!selectedIncidentId) return;
+    if (!confirm('Are you sure you want to delete this incident report?')) return;
+    try {
+        const res = await fetch(`/api/incidents/${selectedIncidentId}`, { method: 'DELETE', headers: getAuthHeaders() });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Failed to delete report');
+        showToast('Deleted', data.message, 'success');
+        clearIncidentForm();
+        loadIncidents();
+    } catch (error) {
+        showToast('Error', error.message, 'error');
+    }
+}
+
+// =========================================================
+// REPORTS & EXPORT GENERATION
+// =========================================================
+async function loadReportStats() {
+    try {
+        const res = await fetch('/api/dashboard/stats', { headers: getAuthHeaders() });
+        if (!res.ok) throw new Error('Stats failure');
+        const stats = await res.json();
+
+        document.getElementById('report-stat-prisoners').textContent = stats.prisoners;
+        document.getElementById('report-stat-staff').textContent = stats.staff;
+        document.getElementById('report-stat-visitors').textContent = stats.visitors;
+        document.getElementById('report-stat-cells').textContent = stats.cells;
+        document.getElementById('report-stat-incidents').textContent = stats.incidents;
+    } catch (error) {
+        showToast('Report Loader Error', error.message, 'error');
+    }
+}
+
+async function exportCSV(collection) {
+    try {
+        let endpoint = `/api/${collection}`;
+        if (collection === 'cells' || collection === 'incidents') endpoint = `/api/${collection}`;
+
+        const res = await fetch(endpoint, { headers: getAuthHeaders() });
+        if (!res.ok) throw new Error('Unable to extract collection data');
+        const list = await res.json();
+
+        if (list.length === 0) {
+            showToast('Export Alert', 'No records found to export', 'error');
+            return;
+        }
+
+        // Extract headers
+        const cols = Object.keys(list[0]).filter(k => k !== '_id');
+        const csvRows = [cols.join(',')];
+
+        list.forEach(doc => {
+            const values = cols.map(col => {
+                const val = doc[col] || '';
+                // Escape quotes
+                return `"${String(val).replace(/"/g, '""')}"`;
+            });
+            csvRows.push(values.join(','));
+        });
+
+        const csvContent = "data:text/csv;charset=utf-8," + csvRows.join("\n");
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", `${collection}_export_${new Date().toISOString().split('T')[0]}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        showToast('Export Success', `Downloaded ${collection} CSV archive`, 'success');
+    } catch (error) {
+        showToast('Export Error', error.message, 'error');
+    }
+}
+
+// =========================================================
+// SECURITY AUDIT LOGS
+// =========================================================
+async function loadAuditLogs() {
+    const tbody = document.getElementById('logs-table-body');
+    if (!tbody) return;
+    try {
+        const res = await fetch('/api/logs', { headers: getAuthHeaders() });
+        if (!res.ok) throw new Error('Access denied: Admin only');
+        const list = await res.json();
+        tbody.innerHTML = '';
+
+        list.forEach(log => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+        <td><strong>${log.username}</strong></td>
+        <td><span class="cell-tag">${log.action}</span></td>
+        <td>${log.details || '-'}</td>
+        <td style="font-size:12px; color:var(--text-secondary);">${log.timestamp}</td>
+      `;
+            tbody.appendChild(tr);
+        });
+    } catch (error) {
+        tbody.innerHTML = `<tr><td colspan="4" class="text-danger" style="text-align:center;">Failed to load system logs: ${error.message} (Requires Admin Role)</td></tr>`;
+    }
+}
+
+// =========================================================
+// ADMIN APPROVALS
+// =========================================================
+async function loadPendingUsers() {
+    const tbody = document.getElementById('approvals-table-body');
+    if (!tbody) return;
+    try {
+        const res = await fetch('/api/admin/pending_users', { headers: getAuthHeaders() });
+        if (!res.ok) throw new Error('Access denied');
+        const list = await res.json();
+        tbody.innerHTML = '';
+
+        if (list.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="5" class="text-secondary" style="text-align:center;">No pending approvals at this time.</td></tr>`;
+            return;
+        }
+
+        list.forEach(u => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+        <td><strong>${u.username}</strong></td>
+        <td><span class="cell-tag">${u.role}</span></td>
+        <td>${u.email || '-'}</td>
+        <td style="font-size:12px; color:var(--text-secondary);">${u.created_at || '-'}</td>
+        <td>
+          <button onclick="approveUser('${u._id}')" class="btn btn-primary" style="padding: 6px 12px; font-size: 12px; margin-right: 5px;">
+            <i data-lucide="check" style="width: 14px; height: 14px;"></i> Approve
+          </button>
+          <button onclick="rejectUser('${u._id}')" class="btn btn-danger" style="padding: 6px 12px; font-size: 12px;">
+            <i data-lucide="x" style="width: 14px; height: 14px;"></i> Reject
+          </button>
+        </td>
+      `;
+            tbody.appendChild(tr);
+        });
+        if (window.lucide) window.lucide.createIcons();
+    } catch (error) {
+        tbody.innerHTML = `<tr><td colspan="5" class="text-danger" style="text-align:center;">Failed to load pending users</td></tr>`;
+    }
+}
+
+async function approveUser(id) {
+    if (!confirm('Are you sure you want to approve this user? They will gain access to the system immediately.')) return;
+    try {
+        const res = await fetch(`/api/admin/approve/${id}`, { method: 'POST', headers: getAuthHeaders() });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error);
+        showToast('User Approved', data.message, 'success');
+        loadPendingUsers();
+    } catch (error) {
+        showToast('Error', error.message, 'error');
+    }
+}
+
+async function rejectUser(id) {
+    if (!confirm('Are you sure you want to reject this user? Their request will be permanently deleted.')) return;
+    try {
+        const res = await fetch(`/api/admin/reject/${id}`, { method: 'DELETE', headers: getAuthHeaders() });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error);
+        showToast('User Rejected', data.message, 'success');
+        loadPendingUsers();
+    } catch (error) {
+        showToast('Error', error.message, 'error');
+    }
+}
+
+// =========================================================
+// PDF DOSSIER GENERATION & PREVIEW
+// =========================================================
+function formatPrettyDate(dateStr) {
+    if (!dateStr || dateStr === 'N/A') return 'N/A';
+    try {
+        const parts = dateStr.split('-');
+        if (parts.length === 3) {
+            const d = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
+            return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+        }
+        const d = new Date(dateStr);
+        if (!isNaN(d.getTime())) {
+            return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+        }
+    } catch (e) {
+        console.warn(e);
+    }
+    return dateStr;
+}
+
+function populateDossierFields(pId) {
+    const pName = document.getElementById('p-name').value || 'N/A';
+    const pAge = document.getElementById('p-age').value || 'N/A';
+    const pGender = document.getElementById('p-gender').value || 'N/A';
+    const pCell = document.getElementById('p-cell').value || 'N/A';
+    const pBlock = document.getElementById('p-block').value || 'N/A';
+    const pCrime = document.getElementById('p-crime').value || 'N/A';
+    const pEntry = document.getElementById('p-entry').value || '';
+    const pDays = document.getElementById('p-days').value || '';
+    const pEmergency = document.getElementById('p-emergency').value || 'N/A';
+    const pPhone = document.getElementById('p-phone').value || 'N/A';
+
+    // Find row to get release date and status
+    const row = Array.from(document.querySelectorAll('#prisoners-table-body tr')).find(r => r.cells[1] && r.cells[1].textContent.trim() === pId);
+    let releaseDateStr = 'N/A';
+    let status = 'ACTIVE';
+    let statusColor = '#ef4444'; // Red
+
+    if (row && row.cells[8]) releaseDateStr = row.cells[8].textContent.trim();
+    if (row && row.cells[9]) {
+        const rowStatus = row.cells[9].textContent.trim().toUpperCase();
+        if (rowStatus === 'RELEASED') {
+            status = 'RELEASED';
+            statusColor = '#10b981'; // Green
+        }
+    }
+
+    if ((!releaseDateStr || releaseDateStr === 'N/A') && pEntry && pDays) {
+        try {
+            const entryD = new Date(pEntry);
+            entryD.setDate(entryD.getDate() + parseInt(pDays, 10));
+            const yyyy = entryD.getFullYear();
+            const mm = String(entryD.getMonth() + 1).padStart(2, '0');
+            const dd = String(entryD.getDate()).padStart(2, '0');
+            releaseDateStr = `${yyyy}-${mm}-${dd}`;
+            if (entryD < new Date()) {
+                status = 'RELEASED';
+                statusColor = '#10b981';
+            }
+        } catch (e) {}
+    }
+
+    let sentenceDisplay = 'N/A';
+    if (pDays) {
+        const d = parseInt(pDays, 10);
+        if (!isNaN(d) && d > 0) {
+            if (d % 365 === 0) {
+                const yrs = d / 365;
+                sentenceDisplay = `${yrs} Year${yrs > 1 ? 's' : ''}`;
+            } else if (d >= 365) {
+                const yrs = (d / 365).toFixed(1).replace('.0', '');
+                sentenceDisplay = `${yrs} Years (${d} Days)`;
+            } else {
+                sentenceDisplay = `${d} Days`;
+            }
+        }
+    }
+
+    const officerName = (document.getElementById('sidebar-username') && document.getElementById('sidebar-username').textContent) || 'Officer';
+    const currentDateFormatted = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' });
+
+    // Populate DOM
+    document.getElementById('dossier-id').textContent = pId;
+    document.getElementById('dossier-header-id').textContent = pId;
+
+    document.getElementById('dossier-header-status').textContent = status;
+    document.getElementById('dossier-header-status').style.backgroundColor = statusColor;
+    document.getElementById('dossier-summary-status').textContent = status;
+    document.getElementById('dossier-summary-status').style.color = statusColor;
+    document.getElementById('dossier-info-status').textContent = status;
+    document.getElementById('dossier-info-status').style.color = statusColor;
+
+    document.getElementById('dossier-gen-officer').textContent = officerName;
+    document.getElementById('dossier-gen-date').textContent = currentDateFormatted;
+
+    document.getElementById('dossier-name').textContent = pName;
+    document.getElementById('dossier-age').textContent = pAge;
+    document.getElementById('dossier-gender').textContent = pGender;
+    document.getElementById('dossier-cell').textContent = pCell;
+    document.getElementById('dossier-block').textContent = pBlock;
+    document.getElementById('dossier-crime').textContent = pCrime;
+
+    document.getElementById('dossier-entry').textContent = formatPrettyDate(pEntry);
+    document.getElementById('dossier-sentence').textContent = sentenceDisplay;
+    document.getElementById('dossier-release').textContent = formatPrettyDate(releaseDateStr);
+
+    document.getElementById('dossier-contact').textContent = pEmergency;
+    document.getElementById('dossier-phone').textContent = pPhone;
+
+    document.getElementById('dossier-info-cell').textContent = pCell;
+    document.getElementById('dossier-info-block').textContent = pBlock;
+
+    // Handle photo
+    const previewEl = document.getElementById('p-photo-preview');
+    const photoEl = document.getElementById('dossier-photo');
+    if (previewEl && previewEl.src && previewEl.src.length > 50 && previewEl.style.display !== 'none') {
+        photoEl.src = previewEl.src;
+    } else {
+        photoEl.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 240" fill="%23475569"><path d="M100 30a45 45 0 1 0 0 90 45 45 0 0 0 0-90zm0 105c-48 0-85 30-85 70v25h170v-25c0-40-37-70-85-70z"/></svg>';
+    }
+
+    const titleEl = document.getElementById('modal-dossier-title');
+    if (titleEl) titleEl.textContent = `Inmate Dossier: ${pName} (${pId})`;
+}
+
+async function generateDossier() {
+    if (!selectedPrisonerId) {
+        showToast('Selection Required', 'Please select a prisoner from the table first.', 'error');
+        return;
+    }
+
+    const pId = selectedPrisonerId;
+    populateDossierFields(pId);
+
+    // Show modal preview
+    const modal = document.getElementById('dossier-modal');
+    if (modal) {
+        modal.style.display = 'block';
+        if (window.lucide) window.lucide.createIcons();
+    }
+
+    // Auto-trigger download
+    await downloadDossierPDF();
+}
+
+async function downloadDossierPDF() {
+    const pId = selectedPrisonerId || (document.getElementById('dossier-id') && document.getElementById('dossier-id').textContent) || 'Record';
+    const targetElement = document.getElementById('dossier-template');
+
+    if (!targetElement) {
+        showToast('Error', 'Dossier element not found.', 'error');
+        return;
+    }
+
+    const btn = document.getElementById('modal-download-btn');
+    if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = `<i data-lucide="loader-2" style="width:15px;height:15px;animation:spin 0.8s linear infinite;"></i> Downloading...`;
+        if (window.lucide) window.lucide.createIcons();
+    }
+
+    showToast('Generating PDF', `Preparing high-resolution Dossier_${pId}.pdf...`, 'info');
+
+    // Wait for images to load
+    const imgEl = targetElement.querySelector('#dossier-photo');
+    if (imgEl && !imgEl.complete) {
+        await new Promise(resolve => {
+            imgEl.onload = resolve;
+            imgEl.onerror = resolve;
+        });
+    }
+
+    await new Promise(resolve => setTimeout(resolve, 200));
+
+    try {
+        if (window.html2canvas) {
+            const canvas = await window.html2canvas(targetElement, {
+                scale: 2, // 2x crisp retina resolution
+                useCORS: true,
+                allowTaint: true,
+                backgroundColor: '#ffffff',
+                scrollX: 0,
+                scrollY: 0,
+                logging: false
+            });
+
+            const JsPDFClass = (window.jspdf && window.jspdf.jsPDF) || window.jsPDF;
+            if (JsPDFClass) {
+                const pdf = new JsPDFClass({
+                    orientation: 'portrait',
+                    unit: 'mm',
+                    format: 'a4'
+                });
+
+                const imgData = canvas.toDataURL('image/jpeg', 0.98);
+                const pdfWidth = pdf.internal.pageSize.getWidth();
+                const pdfHeight = pdf.internal.pageSize.getHeight();
+
+                pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
+                pdf.save(`Dossier_${pId}.pdf`);
+                showToast('Success', `Dossier_${pId}.pdf downloaded successfully!`, 'success');
+            } else if (window.html2pdf) {
+                const opt = {
+                    margin: 0,
+                    filename: `Dossier_${pId}.pdf`,
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff' },
+                    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                };
+                await window.html2pdf().set(opt).from(targetElement).save();
+                showToast('Success', `Dossier_${pId}.pdf downloaded successfully!`, 'success');
+            }
+        } else if (window.html2pdf) {
+            const opt = {
+                margin: 0,
+                filename: `Dossier_${pId}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff' },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+            await window.html2pdf().set(opt).from(targetElement).save();
+            showToast('Success', `Dossier_${pId}.pdf downloaded successfully!`, 'success');
+        } else {
+            // Native fallback
+            window.print();
+        }
+    } catch (err) {
+        console.error('PDF Download Error:', err);
+        showToast('Error', 'PDF download failed. You can use the Print button to Save as PDF.', 'error');
+    } finally {
+        if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = `<i data-lucide="download" style="width:15px;height:15px;"></i> Download PDF`;
+            if (window.lucide) window.lucide.createIcons();
+        }
+    }
+}
+
+function printDossier() {
+    window.print();
+}
+
+function closeDossierModal() {
+    const modal = document.getElementById('dossier-modal');
+    if (modal) modal.style.display = 'none';
+}
+
+// Close modal on Escape key
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeDossierModal();
+});
+
+// =========================================================
+// THEME TOGGLE
+// =========================================================
+function toggleTheme() {
+    const root = document.documentElement;
+    const icon = document.getElementById('theme-icon');
+
+    if (root.getAttribute('data-theme') === 'light') {
+        root.removeAttribute('data-theme');
+        icon.setAttribute('data-lucide', 'moon');
+    } else {
+        root.setAttribute('data-theme', 'light');
+        icon.setAttribute('data-lucide', 'sun');
+    }
+
+    if (window.lucide) window.lucide.createIcons();
+
+    // Add a fun GSAP twist to the toggle
+    if (window.gsap) {
+        gsap.fromTo(icon, { rotation: -90, scale: 0.5 }, { rotation: 0, scale: 1, duration: 0.5, ease: 'back.out(2)' });
+    }
+}
+
+// =========================================================
+// INITIALIZE
+// =========================================================
+document.addEventListener('DOMContentLoaded', () => {
+    startLiveClock();
+    checkSession();
+});
+
+</script>
+</body>
+</html>
