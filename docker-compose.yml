@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:7.0
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - jms-network
+
+  web:
+    build: .
+    restart: always
+    ports:
+      - "5000:5000"
+    environment:
+      - MONGO_URI=mongodb://mongodb:27017/
+      - HOST=0.0.0.0
+      - PORT=5000
+      - DEBUG=False
+      # Optional Gmail SMTP settings for OTP
+      # - GMAIL_SENDER=your-email@gmail.com
+      # - GMAIL_PASSWORD=your-app-password
+    depends_on:
+      - mongodb
+    networks:
+      - jms-network
+
+volumes:
+  mongo_data:
+
+networks:
+  jms-network:
+    driver: bridge
